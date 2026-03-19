@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CarBuilding101 — Build Picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#5BAAF0;--blue-dark:#2e86d4;--blue-glow:rgba(91,170,240,0.12);
+  --black:#08090b;--dark:#0d0e14;--surface:#13151d;--s2:#191c28;--s3:#1e2232;
+  --border:rgba(255,255,255,0.08);--b2:rgba(91,170,240,0.24);--b3:rgba(255,255,255,0.13);
+  --text:#eeedf2;--muted:#7e7d8e;--subtle:#28273a;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --ff:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:2px}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;background:rgba(8,9,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--ff);font-size:20px;letter-spacing:2px;color:var(--text);text-decoration:none}.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:20px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-xs{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.btn-ghost:hover{border-color:var(--b2)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+
+.page{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 58px);margin-top:58px}
+
+/* SIDEBAR */
+.sidebar{background:var(--dark);border-right:1px solid var(--border);padding:24px 20px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+.sb-label{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+
+/* Step track */
+.steps{display:flex;flex-direction:column;gap:0}
+.step{display:flex;align-items:flex-start;gap:11px;padding:9px 0;position:relative}
+.step:not(:last-child)::after{content:'';position:absolute;left:12px;top:30px;bottom:0;width:1px;background:var(--border)}
+.sdot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;z-index:1;transition:all .3s}
+.sdot.done{background:var(--blue);color:#fff}
+.sdot.active{background:var(--blue-glow);border:2px solid var(--blue);color:var(--blue)}
+.sdot.idle{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.step-title{font-size:13px;font-weight:600;line-height:1.2}
+.step-sub{font-size:11px;color:var(--muted);margin-top:1px}
+
+.sel-group{display:flex;flex-direction:column;gap:7px}
+.sel{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:9px 12px;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%237e7d8e' d='M5 7L1 3h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s}
+.sel:focus{border-color:var(--blue)}
+.sel option{background:var(--s2)}
+
+.car-card{background:var(--s2);border:1px solid var(--b2);border-radius:9px;padding:13px;display:none}
+.car-card.show{display:block}
+.cc-make{font-family:var(--ff);font-size:22px;letter-spacing:1px;line-height:1;margin-bottom:3px}
+.cc-sub{font-size:11px;color:var(--muted)}
+.cc-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.ctag{font-size:10px;font-family:var(--fm);padding:2px 7px;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+
+.build-sum{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px}
+.bs-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.bs-row:last-child{border-bottom:none}
+.bs-k{color:var(--muted)}.bs-v{font-weight:600;font-family:var(--fm);font-size:11px}
+.total-b{background:var(--blue-glow);border:1px solid var(--b2);border-radius:7px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.total-num{font-family:var(--ff);font-size:28px;letter-spacing:1px;color:var(--blue)}
+
+/* MAIN */
+.main{padding:24px 28px;display:flex;flex-direction:column;gap:22px}
+
+.cat-tabs{display:flex;gap:5px;flex-wrap:wrap}
+.ct{padding:7px 16px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;display:flex;align-items:center;gap:5px;font-family:var(--fb)}
+.ct:hover{border-color:var(--b2);color:var(--text)}
+.ct.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.ct-count{font-size:9px;font-family:var(--fm);background:rgba(255,255,255,.15);padding:1px 5px;border-radius:8px}
+
+.ph{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ph-title{font-family:var(--ff);font-size:26px;letter-spacing:1px}
+.ph-sub{font-size:12px;color:var(--muted)}
+.sort-sel{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:var(--fb);font-size:12px;outline:none;cursor:pointer}
+
+.conflict{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:7px;padding:11px 14px;display:flex;align-items:flex-start;gap:9px;font-size:13px;color:var(--amber);display:none}
+.conflict.show{display:flex}
+
+.parts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+
+.pc{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.pc:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-2px)}
+.pc.added{border-color:var(--blue);background:var(--blue-glow)}
+.pc.added::after{content:'✓ Added';position:absolute;top:10px;right:10px;font-size:9px;font-family:var(--fm);color:var(--blue);letter-spacing:1px}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.pc-icon{font-size:20px}
+.pc-badge{font-size:9px;font-family:var(--fm);padding:3px 7px;border-radius:3px;letter-spacing:.5px}
+.ok{background:rgba(34,197,94,.12);color:var(--green)}
+.warn{background:rgba(245,158,11,.12);color:var(--amber)}
+.req{background:rgba(91,170,240,.12);color:var(--blue)}
+.pc-name{font-size:15px;font-weight:600;margin-bottom:3px}
+.pc-brand{font-size:11px;color:var(--muted);margin-bottom:10px}
+.pc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:12px}
+.pc-stat{background:var(--s2);border-radius:5px;padding:6px 8px}
+.pc-stat-l{font-size:9px;color:var(--muted);font-family:var(--fm);letter-spacing:.5px;text-transform:uppercase;margin-bottom:1px}
+.pc-stat-v{font-size:12px;font-weight:600}
+.green{color:var(--green)}.amber{color:var(--amber)}.blue{color:var(--blue)}
+.pc-foot{display:flex;align-items:center;justify-content:space-between}
+.pc-price{font-family:var(--ff);font-size:20px;letter-spacing:.5px;color:var(--blue)}
+.add-btn{background:var(--blue);color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.add-btn:hover{background:var(--blue-dark)}
+.add-btn.done{background:var(--s3);color:var(--muted);cursor:default}
+
+/* Buy links on part card */
+.pc-buy{display:flex;gap:5px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.pbl{flex:1;text-align:center;padding:6px 4px;border-radius:5px;font-size:10px;font-weight:600;text-decoration:none;border:1px solid;transition:all .2s}
+.pbl.am{background:rgba(255,153,0,.08);border-color:rgba(255,153,0,.25);color:#ff9900}.pbl.am:hover{background:rgba(255,153,0,.16)}
+.pbl.eb{background:rgba(74,144,226,.08);border-color:rgba(74,144,226,.25);color:#4a90e2}.pbl.eb:hover{background:rgba(74,144,226,.16)}
+.pbl.ra{background:rgba(224,85,85,.08);border-color:rgba(224,85,85,.25);color:#e05555}.pbl.ra:hover{background:rgba(224,85,85,.16)}
+
+/* TRAY */
+.tray{position:fixed;right:0;top:58px;bottom:0;width:300px;background:var(--dark);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .3s ease;z-index:150;display:flex;flex-direction:column;padding:20px}
+.tray.open{transform:translateX(0)}
+.tray-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.tray-title{font-family:var(--ff);font-size:24px;letter-spacing:1px}
+.tray-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer}
+.tray-items{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px}
+.ti{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 12px;display:flex;align-items:center;gap:8px}
+.ti-name{font-size:12px;font-weight:500;flex:1}
+.ti-price{font-family:var(--fm);font-size:10px;color:var(--blue)}
+.ti-rm{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:2px 5px;border-radius:4px;transition:all .2s}.ti-rm:hover{color:var(--red);background:rgba(239,68,68,.08)}
+.tray-foot{margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.tray-total-row{display:flex;justify-content:space-between;margin-bottom:12px}
+.tray-total-val{font-family:var(--ff);font-size:28px;letter-spacing:1px;color:var(--blue)}
+.tray-cta{width:100%;background:var(--blue);color:#fff;border:none;padding:12px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:background .2s}.tray-cta:hover{background:var(--blue-dark)}
+
+.float-btn{position:fixed;bottom:24px;right:24px;background:var(--blue);color:#fff;border:none;padding:12px 20px;border-radius:50px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fb);box-shadow:0 6px 24px rgba(91,170,240,.35);transition:all .2s;z-index:100;display:flex;align-items:center;gap:7px}
+.float-btn:hover{background:var(--blue-dark);transform:translateY(-2px)}
+.f-count{background:rgba(255,255,255,.22);padding:1px 7px;border-radius:8px;font-size:11px}
+
+.empty{text-align:center;padding:48px 16px;color:var(--muted)}
+.empty-icon{font-size:40px;opacity:.3;margin-bottom:12px}
+
+@media(max-width:860px){.page{grid-template-columns:1fr}.sidebar{position:static;height:auto}.nav-links{display:none}}
+@media(max-width:500px){.main{padding:16px}.parts-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">CAR<span>BUILDING</span>101</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="community.html">Community</a></li>
+    <li><a href="garage.html">Garage</a></li>
+    <li><a href="viewer.html">3D Viewer</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="btn-xs btn-ghost">Log In</a>
+    <button class="btn-xs btn-blue" onclick="toggleTray()">My Build <span id="navCnt" style="background:rgba(255,255,255,.2);padding:1px 6px;border-radius:8px;font-size:10px">0</span></button>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div>
+      <div class="sb-label">Build Progress</div>
+      <div class="steps">
+        <div class="step"><div class="sdot done" id="s1">✓</div><div><div class="step-title">Select Your Car</div><div class="step-sub" id="s1sub">Choose year, make, model</div></div></div>
+        <div class="step"><div class="sdot active" id="s2">2</div><div><div class="step-title">Add Modifications</div><div class="step-sub">Browse &amp; add parts</div></div></div>
+        <div class="step"><div class="sdot idle" id="s3">3</div><div><div class="step-title">Check Compatibility</div><div class="step-sub">Review conflicts</div></div></div>
+        <div class="step"><div class="sdot idle" id="s4">4</div><div><div class="step-title">Buy Parts</div><div class="step-sub">Direct links to retailers</div></div></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sb-label">Your Car</div>
+      <div class="sel-group">
+        <select class="sel" id="selYear" onchange="updateCar()">
+          <option value="">Year</option>
+          <option selected>2021</option><option>2022</option><option>2020</option><option>2019</option><option>2018</option><option>2017</option><option>2016</option><option>2015</option><option>2013</option><option>2010</option><option>2008</option><option>2006</option><option>2003</option><option>2000</option>
+        </select>
+        <select class="sel" id="selMake" onchange="updateModels()">
+          <option value="">Make</option>
+          <option selected>Toyota</option><option>Honda</option><option>Subaru</option><option>Mitsubishi</option><option>Nissan</option><option>Ford</option><option>Chevrolet</option><option>Dodge</option><option>BMW</option><option>Volkswagen</option><option>Mazda</option><option>Acura</option>
+        </select>
+        <select class="sel" id="selModel" onchange="updateCar()">
+          <option value="">Model</option>
+          <option selected>GR Supra</option>
+        </select>
+        <select class="sel" id="selTrim" onchange="updateCar()">
+          <option value="">Trim (optional)</option>
+          <option selected>3.0 Base</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="car-card show" id="carCard">
+      <div class="cc-make" id="ccMake">2021 GR Supra</div>
+      <div class="cc-sub" id="ccSub">3.0L B58 Turbo · RWD · 382 hp stock</div>
+      <div class="cc-tags" id="ccTags">
+        <span class="ctag">B58</span><span class="ctag">RWD</span><span class="ctag">382 hp</span><span class="ctag">368 lb-ft</span>
+      </div>
+    </div>
+
+    <div id="sumSection" style="display:none">
+      <div class="sb-label">Build Summary</div>
+      <div class="build-sum">
+        <div class="bs-row"><span class="bs-k">Parts</span><span class="bs-v blue" id="sumParts">0</span></div>
+        <div class="bs-row"><span class="bs-k">Est. HP Gain</span><span class="bs-v amber" id="sumHp">+0 whp</span></div>
+        <div class="bs-row"><span class="bs-k">Tune Needed</span><span class="bs-v" id="sumTune" style="color:var(--muted)">No</span></div>
+        <div class="bs-row"><span class="bs-k">Conflicts</span><span class="bs-v green" id="sumConf">None</span></div>
+      </div>
+      <div class="total-b">
+        <div><div style="font-size:10px;color:var(--muted);font-family:var(--fm);letter-spacing:1px">TOTAL COST</div><div style="font-size:10px;color:var(--subtle);font-family:var(--fm);margin-top:2px" id="sumLabel">0 parts</div></div>
+        <div class="total-num" id="sumTotal">$0</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div>
+      <div class="sb-label" style="margin-bottom:8px">Category</div>
+      <div class="cat-tabs">
+        <div class="ct active" onclick="filterCat(this,'all')">All <span class="ct-count">24</span></div>
+        <div class="ct" onclick="filterCat(this,'engine')">⚙️ Engine <span class="ct-count">8</span></div>
+        <div class="ct" onclick="filterCat(this,'exhaust')">💨 Exhaust <span class="ct-count">4</span></div>
+        <div class="ct" onclick="filterCat(this,'suspension')">🌊 Suspension <span class="ct-count">4</span></div>
+        <div class="ct" onclick="filterCat(this,'brakes')">🛑 Brakes <span class="ct-count">3</span></div>
+        <div class="ct" onclick="filterCat(this,'aero')">🏎️ Aero <span class="ct-count">3</span></div>
+        <div class="ct" onclick="filterCat(this,'wheels')">🛞 Wheels <span class="ct-count">2</span></div>
+      </div>
+    </div>
+
+    <div class="ph">
+      <div><div class="ph-title" id="phTitle">All Parts</div><div class="ph-sub" id="phSub">24 parts · 2021 Toyota GR Supra</div></div>
+      <select class="sort-sel" onchange="sortParts(this.value)">
+        <option value="popular">Most Popular</option>
+        <option value="hp">HP Gain ↑</option>
+        <option value="price-lo">Price: Low → High</option>
+        <option value="price-hi">Price: High → Low</option>
+        <option value="easy">Easiest First</option>
+      </select>
+    </div>
+
+    <div class="conflict" id="conflictBar">
+      <span>⚠️</span>
+      <div><strong>Tune Required:</strong> You've added a catless downpipe without a tune. This can cause lean conditions on B58 engines. <span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="filterCat(document.querySelectorAll('.ct')[1],'engine')">Add a tune →</span></div>
+    </div>
+
+    <div class="parts-grid" id="partsGrid"></div>
+  </main>
+</div>
+
+<button class="float-btn" onclick="toggleTray()">🔧 My Build <span class="f-count" id="floatCnt">0 parts</span></button>
+
+<div class="tray" id="tray">
+  <div class="tray-h"><div class="tray-title">My Build</div><button class="tray-close" onclick="toggleTray()">✕</button></div>
+  <div class="tray-items" id="trayItems"><div class="empty"><div class="empty-icon">🔧</div><div>No parts added yet</div></div></div>
+  <div class="tray-foot">
+    <div class="tray-total-row"><div style="color:var(--muted);font-size:12px">Total Est. Cost</div><div class="tray-total-val" id="trayTotal">$0</div></div>
+    <button class="tray-cta">Share This Build →</button>
+  </div>
+</div>
+
+<script>
+const DB = {
+  Toyota:{GR_Supra:['3.0 Base','A91 Edition'],GR86:['Base','Premium'],'Corolla GR':['Core','Circuit']},
+  Honda:{'Civic Type R':['Base'],'Civic Si':['Sedan'],Accord:['Sport','Touring']},
+  Subaru:{WRX:['Base','Premium','Limited'],'WRX STI':['Base','Limited','S209'],BRZ:['Premium','Limited']},
+  Mitsubishi:{'Lancer Evo X':['GSR','MR'],'Lancer Evo IX':['GSR','MR','RS']},
+  Nissan:{'GT-R':['Premium','Track','NISMO'],'370Z':['Base','Sport','NISMO']},
+  Ford:{'Mustang GT':['Fastback','Convertible'],'Mustang Shelby GT500':['Base','Carbon Pack'],'Focus RS':['Base']},
+  Chevrolet:{'Camaro SS':['1LE','Base'],'Corvette C8':['Stingray','Z06']},
+  Dodge:{'Challenger SRT':['392','Hellcat','Demon 170'],'Charger Hellcat':['Base','Redeye']},
+  BMW:{M3:['Competition','xDrive'],M4:['Competition','CSL'],M2:['Base','Competition']},
+  Volkswagen:{'Golf R':['Base'],'Golf GTI':['S','SE','Autobahn']},
+  Mazda:{'MX-5 Miata':['Sport','Club','Grand Touring']},
+  Acura:{'Integra Type S':['Base'],NSX:['Base','Type S']},
+};
+
+const PARTS = [
+  {id:1,name:'Cold Air Intake',brand:'AEM / Eventuri',cat:'engine',icon:'🌬️',hp:'+8–12 whp',hpNum:10,diff:'Easy',diffC:'green',price:260,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:95,
+   desc:'Direct-fit B58 intake. 2–3 hr DIY install.',
+   amazon:'https://www.amazon.com/s?k=cold+air+intake+toyota+supra+b58',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+b58+cold+air+intake',
+   rockauto:'https://www.rockauto.com'},
+  {id:2,name:'Stage 2 ECU Tune',brand:'BM3 / Wedge',cat:'engine',icon:'💻',hp:'+45–65 whp',hpNum:55,diff:'Software only',diffC:'blue',price:600,tune:'IS the tune',compat:'ok',badge:'✓ COMPATIBLE',pop:92,
+   desc:'Unlocks full combo gains. E30/E50 flex maps available.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+ecu+tune',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+ecu+tune+bm3',
+   rockauto:'https://www.rockauto.com'},
+  {id:3,name:'Downpipe (Catless)',brand:'VRSF / Eventuri',cat:'exhaust',icon:'⬇️',hp:'+20–28 whp',hpNum:24,diff:'Moderate',diffC:'amber',price:420,tune:'Strongly recommended',compat:'warn',badge:'⚠ TUNE NEEDED',pop:88,
+   desc:'20–28whp gains. Tune strongly recommended on B58.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+downpipe',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+catless+downpipe',
+   rockauto:'https://www.rockauto.com'},
+  {id:4,name:'Catback Exhaust',brand:'Akrapovič / Remus',cat:'exhaust',icon:'💨',hp:'+12–18 whp',hpNum:15,diff:'Easy',diffC:'green',price:1100,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:90,
+   desc:'Significant sound increase. Valved options available.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+catback+exhaust',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+catback+exhaust',
+   rockauto:'https://www.rockauto.com'},
+  {id:5,name:'Intercooler Upgrade',brand:'Wagner / Mishimoto',cat:'engine',icon:'❄️',hp:'+8–15 whp',hpNum:12,diff:'Moderate',diffC:'amber',price:650,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:82,
+   desc:'Required before turbo upgrade. Kills heat soak.',
+   amazon:'https://www.amazon.com/s?k=supra+b58+intercooler+upgrade',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+intercooler',
+   rockauto:'https://www.rockauto.com'},
+  {id:6,name:'Turbo Upgrade (B58)',brand:'Pure / Vargas',cat:'engine',icon:'🌀',hp:'+120–180 whp',hpNum:150,diff:'Hard',diffC:'red',price:3200,tune:'Required',compat:'req',badge:'SUPPORTING MODS REQ.',pop:75,
+   desc:'Stage 2+ turbo. Full supporting mods needed.',
+   amazon:'https://www.amazon.com/s?k=supra+b58+turbo+upgrade+pure',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+turbo+upgrade',
+   rockauto:'https://www.rockauto.com'},
+  {id:7,name:'Coilover Kit',brand:'BC Racing / KW V3',cat:'suspension',icon:'🔩',hp:'N/A',hpNum:0,diff:'Moderate',diffC:'amber',price:1400,tune:'Alignment required',compat:'ok',badge:'✓ COMPATIBLE',pop:89,
+   desc:'Full height + damper adjustability. Alignment after install.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+coilovers',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=toyota+supra+coilovers',
+   rockauto:'https://www.rockauto.com'},
+  {id:8,name:'Sway Bar Set',brand:'Eibach / Whiteline',cat:'suspension',icon:'↔️',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:380,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:70,
+   desc:'Front + rear sway bars. Reduces body roll significantly.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+sway+bars',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+sway+bars',
+   rockauto:'https://www.rockauto.com'},
+  {id:9,name:'Big Brake Kit',brand:'StopTech / Brembo',cat:'brakes',icon:'🛑',hp:'N/A',hpNum:0,diff:'Moderate',diffC:'amber',price:2200,tune:'Not required',compat:'warn',badge:'⚠ CHECK WHEEL CLEARANCE',pop:72,
+   desc:'6-piston front BBK. Check wheel clearance first.',
+   amazon:'https://www.amazon.com/s?k=supra+big+brake+kit',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+big+brake+kit',
+   rockauto:'https://www.rockauto.com'},
+  {id:10,name:'Performance Brake Pads',brand:'Hawk / EBC',cat:'brakes',icon:'🔴',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:120,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:85,
+   desc:'HPS or DTC-60. Improved bite and fade resistance.',
+   amazon:'https://www.amazon.com/s?k=supra+performance+brake+pads',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+brake+pads+hawk',
+   rockauto:'https://www.rockauto.com'},
+  {id:11,name:'Front Splitter',brand:'Rocketbunny / SEIBON',cat:'aero',icon:'🏎️',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:480,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:78,
+   desc:'Adds downforce and aggressive front-end look.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+front+splitter',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+front+splitter',
+   rockauto:'https://www.rockauto.com'},
+  {id:12,name:'Rear Wing (Swan Neck)',brand:'APR / Voltex',cat:'aero',icon:'🦢',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:680,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:74,
+   desc:'High-downforce adjustable swan neck mount.',
+   amazon:'https://www.amazon.com/s?k=toyota+supra+rear+wing',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+rear+wing',
+   rockauto:'https://www.rockauto.com'},
+  {id:13,name:'Forged Wheels 18"',brand:'Volk TE37 / HRE',cat:'wheels',icon:'⭕',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:2800,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:88,
+   desc:'Full forged for weight savings. Check offset for your fenders.',
+   amazon:'https://www.amazon.com/s?k=18+inch+forged+wheels+supra',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=volk+te37+18+inch',
+   rockauto:'https://www.rockauto.com'},
+  {id:14,name:'Performance Tires',brand:'Michelin PS4S / AD08R',cat:'wheels',icon:'🏁',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:900,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:86,
+   desc:'Major grip improvement. Check treadwear rating for track use.',
+   amazon:'https://www.amazon.com/s?k=michelin+pilot+sport+4s',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=michelin+ps4s+tires',
+   rockauto:'https://www.rockauto.com'},
+  {id:15,name:'Clutch Upgrade',brand:'ACT / Exedy',cat:'engine',icon:'⚙️',hp:'N/A',hpNum:0,diff:'Hard',diffC:'red',price:780,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:68,
+   desc:'Required at 450whp+. Stage 2 or puck options available.',
+   amazon:'https://www.amazon.com/s?k=supra+clutch+upgrade+act',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+clutch+upgrade',
+   rockauto:'https://www.rockauto.com'},
+  {id:16,name:'Flex Fuel Kit',brand:'EcuTek / BM3',cat:'engine',icon:'⛽',hp:'+20–30 whp',hpNum:25,diff:'Moderate',diffC:'amber',price:450,tune:'Required',compat:'req',badge:'REQUIRES TUNE',pop:77,
+   desc:'Run E30–E50 blends. Major gains paired with tune.',
+   amazon:'https://www.amazon.com/s?k=supra+flex+fuel+kit',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+flex+fuel+kit',
+   rockauto:'https://www.rockauto.com'},
+  {id:17,name:'LPFP Upgrade',brand:'JB4 / BM3',cat:'engine',icon:'💧',hp:'Required 450whp+',hpNum:0,diff:'Easy',diffC:'green',price:280,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:80,
+   desc:'Low pressure fuel pump. Required above 450whp.',
+   amazon:'https://www.amazon.com/s?k=supra+lpfp+upgrade',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+low+pressure+fuel+pump',
+   rockauto:'https://www.rockauto.com'},
+  {id:18,name:'Strut Tower Brace',brand:'Eibach / Cusco',cat:'suspension',icon:'🏗️',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:240,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:65,
+   desc:'Reduces chassis flex. Improves steering response.',
+   amazon:'https://www.amazon.com/s?k=supra+strut+bar',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+strut+tower+brace',
+   rockauto:'https://www.rockauto.com'},
+  {id:19,name:'Adjustable Camber Arms',brand:'Megan / Whiteline',cat:'suspension',icon:'📐',hp:'N/A',hpNum:0,diff:'Moderate',diffC:'amber',price:320,tune:'Alignment required',compat:'ok',badge:'✓ COMPATIBLE',pop:62,
+   desc:'Full adjustability. Required for aggressive wheel fitment.',
+   amazon:'https://www.amazon.com/s?k=supra+camber+arms',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+adjustable+camber+arms',
+   rockauto:'https://www.rockauto.com'},
+  {id:20,name:'Cat Delete Pipe',brand:'VRSF / BimmerWorld',cat:'exhaust',icon:'🚫',hp:'+5–10 whp',hpNum:7,diff:'Easy',diffC:'green',price:160,tune:'Not required',compat:'warn',badge:'⚠ OFF-ROAD ONLY',pop:58,
+   desc:'Off-road use only. Will throw code without tune.',
+   amazon:'https://www.amazon.com/s?k=supra+cat+delete',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+cat+delete',
+   rockauto:'https://www.rockauto.com'},
+  {id:21,name:'Exhaust Tips',brand:'Remus / Akrapovič',cat:'exhaust',icon:'🔈',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:180,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:60,
+   desc:'Stainless quad or dual tips. Cosmetic upgrade.',
+   amazon:'https://www.amazon.com/s?k=supra+exhaust+tips',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+exhaust+tips',
+   rockauto:'https://www.rockauto.com'},
+  {id:22,name:'Short Shifter Kit',brand:'Raceseng / Mishimoto',cat:'engine',icon:'🎮',hp:'N/A',hpNum:0,diff:'Easy',diffC:'green',price:220,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:72,
+   desc:'Reduces throw by 30–40%. Noticeably tighter feel.',
+   amazon:'https://www.amazon.com/s?k=supra+short+shifter',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+short+shifter',
+   rockauto:'https://www.rockauto.com'},
+  {id:23,name:'Widebody Kit',brand:'Liberty Walk / Rocket Bunny',cat:'aero',icon:'💪',hp:'N/A',hpNum:0,diff:'Hard',diffC:'red',price:4200,tune:'Not required',compat:'warn',badge:'⚠ VERIFY FITMENT',pop:65,
+   desc:'Full fender flare kit. Requires wider wheels + alignment.',
+   amazon:'https://www.amazon.com/s?k=supra+widebody+kit',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+widebody+kit',
+   rockauto:'https://www.rockauto.com'},
+  {id:24,name:'Brake Lines (Braided)',brand:'Goodridge / Russell',cat:'brakes',icon:'🔗',hp:'N/A',hpNum:0,diff:'Moderate',diffC:'amber',price:150,tune:'Not required',compat:'ok',badge:'✓ COMPATIBLE',pop:60,
+   desc:'Eliminates brake fade and sponginess under hard braking.',
+   amazon:'https://www.amazon.com/s?k=supra+braided+brake+lines',
+   ebay:'https://www.ebay.com/sch/i.html?_nkw=supra+braided+brake+lines',
+   rockauto:'https://www.rockauto.com'},
+];
+
+let addedParts=[], currentCat='all', currentSort='popular';
+
+function updateModels(){
+  const make=document.getElementById('selMake').value;
+  const ms=document.getElementById('selModel');
+  ms.innerHTML='<option value="">Model</option>';
+  if(make&&DB[make]){Object.keys(DB[make]).forEach(m=>{ms.innerHTML+=`<option>${m}</option>`;});}
+  updateCar();
+}
+
+function updateCar(){
+  const y=document.getElementById('selYear').value;
+  const mk=document.getElementById('selMake').value;
+  const mo=document.getElementById('selModel').value;
+  if(mk&&mo&&DB[mk]?.[mo]){
+    const ts=document.getElementById('selTrim');
+    ts.innerHTML='<option value="">Trim (optional)</option>';
+    DB[mk][mo].forEach(t=>{ts.innerHTML+=`<option>${t}</option>`;});
+  }
+  if(y&&mk&&mo){
+    document.getElementById('ccMake').textContent=`${y} ${mo}`;
+    document.getElementById('ccSub').textContent=`${mk} · ${mo}`;
+    document.getElementById('carCard').classList.add('show');
+    document.getElementById('s1sub').textContent=`${y} ${mk} ${mo}`;
+    document.getElementById('phSub').textContent=`${PARTS.length} parts · ${y} ${mk} ${mo}`;
+  }
+  renderParts();
+}
+
+function renderParts(){
+  let parts=[...PARTS];
+  if(currentCat!=='all')parts=parts.filter(p=>p.cat===currentCat);
+  if(currentSort==='popular')parts.sort((a,b)=>b.pop-a.pop);
+  else if(currentSort==='hp')parts.sort((a,b)=>b.hpNum-a.hpNum);
+  else if(currentSort==='price-lo')parts.sort((a,b)=>a.price-b.price);
+  else if(currentSort==='price-hi')parts.sort((a,b)=>b.price-a.price);
+  else if(currentSort==='easy')parts.sort((a,b)=>(a.diffC==='green'?0:a.diffC==='amber'?1:2)-(b.diffC==='green'?0:b.diffC==='amber'?1:2));
+
+  const isAdded=id=>addedParts.find(p=>p.id===id);
+  const catName=currentCat==='all'?'All Parts':currentCat.charAt(0).toUpperCase()+currentCat.slice(1);
+  document.getElementById('phTitle').textContent=catName;
+
+  document.getElementById('partsGrid').innerHTML=parts.map(p=>`
+    <div class="pc${isAdded(p.id)?' added':''}" id="pc${p.id}">
+      <div class="pc-top"><span class="pc-icon">${p.icon}</span><span class="pc-badge ${p.compat==='ok'?'ok':p.compat==='warn'?'warn':'req'}">${p.badge}</span></div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-brand">${p.brand}</div>
+      <div class="pc-grid">
+        <div class="pc-stat"><div class="pc-stat-l">HP Gain</div><div class="pc-stat-v ${p.hpNum>0?'amber':'muted'}">${p.hp}</div></div>
+        <div class="pc-stat"><div class="pc-stat-l">Difficulty</div><div class="pc-stat-v ${p.diffC}">${p.diff}</div></div>
+        <div class="pc-stat"><div class="pc-stat-l">Tune</div><div class="pc-stat-v" style="font-size:10px;color:${p.tune.includes('Not')||p.tune.includes('not')?'var(--green)':'var(--amber)'}">${p.tune}</div></div>
+        <div class="pc-stat"><div class="pc-stat-l">Price</div><div class="pc-stat-v blue">$${p.price.toLocaleString()}</div></div>
+      </div>
+      <div class="pc-foot">
+        <div class="pc-price">$${p.price.toLocaleString()}</div>
+        <button class="add-btn${isAdded(p.id)?' done':''}" onclick="event.stopPropagation();togglePart(${p.id})">${isAdded(p.id)?'✓ Added':'+ Add'}</button>
+      </div>
+      <div class="pc-buy">
+        <a class="pbl am" href="${p.amazon}" target="_blank" rel="noopener">Amazon ↗</a>
+        <a class="pbl eb" href="${p.ebay}" target="_blank" rel="noopener">eBay ↗</a>
+        <a class="pbl ra" href="${p.rockauto}" target="_blank" rel="noopener">RockAuto ↗</a>
+      </div>
+    </div>`).join('');
+}
+
+function togglePart(id){
+  const part=PARTS.find(p=>p.id===id);
+  const idx=addedParts.findIndex(p=>p.id===id);
+  if(idx>-1)addedParts.splice(idx,1);
+  else addedParts.push(part);
+  updateSummary(); renderParts(); renderTray(); checkConflict();
+}
+
+function updateSummary(){
+  const total=addedParts.reduce((s,p)=>s+p.price,0);
+  const hp=addedParts.filter(p=>p.hpNum>0).reduce((s,p)=>s+p.hpNum,0);
+  const needsTune=addedParts.some(p=>p.tune==='Required'||p.tune==='Strongly recommended');
+  const warns=addedParts.filter(p=>p.compat==='warn'||p.compat==='req').length;
+  document.getElementById('sumParts').textContent=addedParts.length;
+  document.getElementById('sumHp').textContent=`+${hp} whp est.`;
+  document.getElementById('sumTune').textContent=needsTune?'Yes ⚠':'No';
+  document.getElementById('sumTune').style.color=needsTune?'var(--amber)':'var(--green)';
+  document.getElementById('sumConf').textContent=warns>0?`${warns} item${warns>1?'s':''} ⚠`:'None ✓';
+  document.getElementById('sumConf').style.color=warns>0?'var(--amber)':'var(--green)';
+  document.getElementById('sumTotal').textContent='$'+total.toLocaleString();
+  document.getElementById('sumLabel').textContent=`${addedParts.length} part${addedParts.length!==1?'s':''}`;
+  document.getElementById('sumSection').style.display=addedParts.length>0?'':'none';
+  document.getElementById('navCnt').textContent=addedParts.length;
+  document.getElementById('floatCnt').textContent=`${addedParts.length} part${addedParts.length!==1?'s':''}`;
+  if(addedParts.length>0){
+    document.getElementById('s2').className='sdot done';document.getElementById('s2').textContent='✓';
+    document.getElementById('s3').className='sdot active';
+    if(addedParts.length>=3){document.getElementById('s3').className='sdot done';document.getElementById('s3').textContent='✓';document.getElementById('s4').className='sdot active';}
+  }else{document.getElementById('s2').className='sdot active';document.getElementById('s2').textContent='2';document.getElementById('s3').className='sdot idle';document.getElementById('s4').className='sdot idle';}
+}
+
+function renderTray(){
+  const total=addedParts.reduce((s,p)=>s+p.price,0);
+  document.getElementById('trayTotal').textContent='$'+total.toLocaleString();
+  document.getElementById('trayItems').innerHTML=addedParts.length===0?
+    '<div class="empty"><div class="empty-icon">🔧</div><div>No parts added yet</div></div>':
+    addedParts.map(p=>`<div class="ti"><span>${p.icon}</span><div class="ti-name">${p.name}<div class="ti-price">$${p.price.toLocaleString()}</div></div><button class="ti-rm" onclick="togglePart(${p.id})">✕</button></div>`).join('');
+}
+
+function checkConflict(){
+  const hasDP=addedParts.some(p=>p.name.includes('Downpipe'));
+  const hasTune=addedParts.some(p=>p.cat==='engine'&&p.name.includes('Tune'));
+  document.getElementById('conflictBar').classList.toggle('show',hasDP&&!hasTune);
+}
+
+function filterCat(el,cat){
+  document.querySelectorAll('.ct').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active'); currentCat=cat; renderParts();
+}
+
+function sortParts(v){currentSort=v;renderParts();}
+function toggleTray(){document.getElementById('tray').classList.toggle('open');}
+
+// Init
+document.getElementById('selYear').value='2021';
+document.getElementById('selMake').value='Toyota';
+updateModels();
+setTimeout(()=>{document.getElementById('selModel').value='GR Supra';updateCar();},50);
+renderParts();
+</script>
+</body>
+</html>

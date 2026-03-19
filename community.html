@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CarBuilding101 — Community</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#5BAAF0;--blue-dark:#2e86d4;--blue-glow:rgba(91,170,240,0.12);
+  --black:#08090b;--dark:#0d0e14;--surface:#13151d;--s2:#191c28;--s3:#1e2232;
+  --border:rgba(255,255,255,0.08);--b2:rgba(91,170,240,0.24);--b3:rgba(255,255,255,0.13);
+  --text:#eeedf2;--muted:#7e7d8e;--subtle:#28273a;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --ff:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:2px}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;background:rgba(8,9,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--ff);font-size:20px;letter-spacing:2px;color:var(--text);text-decoration:none}.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:20px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-xs{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.btn-ghost:hover{border-color:var(--b2)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+
+/* HERO */
+.hero{margin-top:58px;background:var(--dark);padding:52px 40px 40px;border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;background:radial-gradient(circle,rgba(91,170,240,.07) 0%,transparent 65%);pointer-events:none}
+.hero-inner{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;margin-bottom:28px}
+.over{font-family:var(--fm);font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+.hero-title{font-family:var(--ff);font-size:clamp(40px,6vw,72px);letter-spacing:2px;line-height:.95}
+.hero-title span{color:var(--blue)}
+.hero-sub{color:var(--muted);font-size:15px;font-weight:300;max-width:380px;line-height:1.65;margin-top:10px}
+.post-btn{background:var(--blue);color:#fff;border:none;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:background .2s;white-space:nowrap;text-decoration:none;display:inline-block}
+.post-btn:hover{background:var(--blue-dark)}
+.stats-row{display:flex;gap:28px;flex-wrap:wrap;padding-top:20px;border-top:1px solid var(--border)}
+.stat-item{}.stat-val{font-family:var(--ff);font-size:26px;letter-spacing:1px;color:var(--blue);line-height:1}
+.stat-label{font-size:11px;color:var(--muted)}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 58px)}
+
+/* FILTER */
+.filters{background:var(--dark);border-right:1px solid var(--border);padding:20px 16px;position:sticky;top:58px;height:calc(100vh - 58px);overflow-y:auto;display:flex;flex-direction:column;gap:18px}
+.fb-label{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.fb-head{display:flex;align-items:center;justify-content:space-between}
+.fb-clear{font-size:11px;color:var(--blue);cursor:pointer;opacity:.8}.fb-clear:hover{opacity:1}
+.fchips{display:flex;flex-direction:column;gap:3px}
+.fchip{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;cursor:pointer;transition:all .2s;border:1px solid transparent;font-size:13px;font-weight:500}
+.fchip:hover{background:var(--surface);border-color:var(--border)}
+.fchip.active{background:var(--blue-glow);border-color:var(--b2);color:var(--blue)}
+.fdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fcount{font-size:10px;font-family:var(--fm);color:var(--muted);margin-left:auto}
+.fchip.active .fcount{color:var(--blue)}
+.range-wrap{display:flex;flex-direction:column;gap:8px}
+.range-val{color:var(--blue);font-size:13px;font-weight:600;text-align:center;font-family:var(--fm)}
+.range-labels{display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:var(--muted)}
+input[type=range]{width:100%;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--subtle);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--blue);border:2px solid var(--dark);cursor:pointer}
+
+/* CONTENT */
+.content{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.content-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.tab-set{display:flex;background:var(--surface);padding:3px;border-radius:8px;border:1px solid var(--border);gap:3px}
+.tab{padding:7px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:transparent;color:var(--muted);font-family:var(--fb);transition:all .2s}
+.tab.active{background:var(--blue);color:#fff}
+.tab:hover:not(.active){color:var(--text);background:var(--s2)}
+.view-btns{display:flex;gap:4px}
+.vb{width:30px;height:30px;border-radius:5px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .2s}
+.vb.active,.vb:hover{border-color:var(--b2);color:var(--blue);background:var(--blue-glow)}
+.result-cnt{font-size:12px;color:var(--muted)}
+.result-cnt b{color:var(--text)}
+.search-box{position:relative}
+.search-box input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:8px 10px 8px 30px;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--blue)}
+.search-box input::placeholder{color:var(--subtle)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.grid.list{grid-template-columns:1fr}
+.bc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .22s}
+.bc:hover{border-color:var(--b2);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.bc.list-card{display:flex}
+.bc-thumb{width:100%;aspect-ratio:16/9;background:var(--s2);position:relative;overflow:hidden}
+.bc-thumb canvas{width:100%;height:100%;display:block}
+.bc-thumb-sm{width:160px;flex-shrink:0;background:var(--s2);position:relative;overflow:hidden}
+.bc-thumb-sm canvas{width:100%;height:100%;display:block}
+.bc-badges{position:absolute;top:8px;left:8px;display:flex;gap:4px}
+.bdg{font-size:9px;font-family:var(--fm);letter-spacing:1px;padding:3px 7px;border-radius:3px;background:rgba(8,9,11,.85);border:1px solid;backdrop-filter:blur(4px)}
+.bdg.hot{border-color:rgba(239,68,68,.5);color:var(--red)}
+.bdg.new{border-color:rgba(34,197,94,.5);color:var(--green)}
+.bdg.trend{border-color:rgba(245,158,11,.5);color:var(--amber)}
+.bc-likes{position:absolute;top:8px;right:8px;background:rgba(8,9,11,.78);border:1px solid var(--border);border-radius:14px;padding:3px 9px;font-size:10px;color:var(--text);font-family:var(--fm)}
+.bc-body{padding:14px 16px;flex:1}
+.bc-make{font-family:var(--ff);font-size:19px;letter-spacing:1px;margin-bottom:3px}
+.bc-user{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.av{width:16px;height:16px;border-radius:50%;background:var(--s3);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:var(--blue);border:1px solid var(--b2)}
+.bc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.bcs{background:var(--s2);border-radius:5px;padding:5px 7px;text-align:center}
+.bcs-val{font-family:var(--fm);font-size:11px;color:var(--blue)}
+.bcs-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.bc-mods{display:flex;flex-wrap:wrap;gap:4px}
+.chip{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--s2);border:1px solid var(--border);color:var(--muted)}
+.chip.blue{border-color:var(--b2);color:var(--blue);background:var(--blue-glow)}
+.bc-foot{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-top:1px solid var(--border)}
+.bc-hp{color:var(--blue);font-family:var(--fm);font-size:11px;font-weight:500}
+.bc-actions{display:flex;gap:5px}
+.act-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;font-family:var(--fb);transition:all .2s;display:flex;align-items:center;gap:3px}
+.act-btn:hover{border-color:var(--b2);color:var(--blue)}
+
+.load-more{text-align:center;padding:16px}
+.load-btn{background:var(--surface);border:1px solid var(--border);color:var(--text);padding:11px 28px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.load-btn:hover{border-color:var(--b2)}
+
+@media(max-width:860px){.layout{grid-template-columns:1fr}.filters{position:static;height:auto}.nav-links{display:none}}
+@media(max-width:500px){.hero{padding:40px 20px 28px}.content{padding:14px 16px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">CAR<span>BUILDING</span>101</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="community.html" class="active">Community</a></li>
+    <li><a href="build-picker.html">Build Tool</a></li>
+    <li><a href="garage.html">Garage</a></li>
+    <li><a href="viewer.html">3D Viewer</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="btn-xs btn-ghost">Log In</a>
+    <a href="#" class="btn-xs btn-blue">Sign Up Free</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="over">Community Builds</div>
+      <div class="hero-title">THE<br><span>GARAGE</span><br>IS OPEN.</div>
+      <div class="hero-sub">Real builds, real parts, real prices. Filter by car type, power level, or mod category.</div>
+    </div>
+    <a href="#" class="post-btn">📸 Post Your Build</a>
+  </div>
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-val">24K+</div><div class="stat-label">Active Builders</div></div>
+    <div class="stat-item"><div class="stat-val">8,400</div><div class="stat-label">Builds Posted</div></div>
+    <div class="stat-item"><div class="stat-val">180K</div><div class="stat-label">Parts Referenced</div></div>
+    <div class="stat-item"><div class="stat-val">96K</div><div class="stat-label">Likes</div></div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="filters">
+    <div class="search-box"><span class="si">🔍</span><input type="text" placeholder="Search builds…" oninput="renderBuilds()"></div>
+
+    <div>
+      <div class="fb-head"><div class="fb-label">Car Type</div><span class="fb-clear" onclick="clearF('type')">Clear</span></div>
+      <div class="fchips" id="typeF">
+        <div class="fchip active" data-v="all" onclick="setF('type','all',this)"><span class="fdot" style="background:var(--blue)"></span>All<span class="fcount">84</span></div>
+        <div class="fchip" data-v="jdm" onclick="setF('type','jdm',this)"><span class="fdot" style="background:var(--red)"></span>🇯🇵 JDM<span class="fcount">32</span></div>
+        <div class="fchip" data-v="muscle" onclick="setF('type','muscle',this)"><span class="fdot" style="background:var(--amber)"></span>🇺🇸 Muscle<span class="fcount">24</span></div>
+        <div class="fchip" data-v="euro" onclick="setF('type','euro',this)"><span class="fdot" style="background:#8b5cf6)"></span>🇪🇺 Euro<span class="fcount">18</span></div>
+        <div class="fchip" data-v="truck" onclick="setF('type','truck',this)"><span class="fdot" style="background:var(--green)"></span>🛻 Truck/SUV<span class="fcount">10</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="fb-head"><div class="fb-label">Mod Focus</div><span class="fb-clear" onclick="clearF('mod')">Clear</span></div>
+      <div class="fchips" id="modF">
+        <div class="fchip active" data-v="all" onclick="setF('mod','all',this)"><span class="fdot" style="background:var(--blue)"></span>All Mods<span class="fcount">84</span></div>
+        <div class="fchip" data-v="engine" onclick="setF('mod','engine',this)"><span class="fdot" style="background:var(--red)"></span>⚙️ Engine<span class="fcount">38</span></div>
+        <div class="fchip" data-v="suspension" onclick="setF('mod','suspension',this)"><span class="fdot" style="background:var(--green)"></span>🌊 Suspension<span class="fcount">22</span></div>
+        <div class="fchip" data-v="aero" onclick="setF('mod','aero',this)"><span class="fdot" style="background:#8b5cf6)"></span>🏎️ Aero<span class="fcount">16</span></div>
+        <div class="fchip" data-v="swap" onclick="setF('mod','swap',this)"><span class="fdot" style="background:var(--amber)"></span>🔄 Swapped<span class="fcount">8</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="fb-head"><div class="fb-label">Power Level</div><span class="fb-clear" onclick="resetPow()">Reset</span></div>
+      <div class="range-wrap">
+        <div class="range-val" id="powVal">0 – 800+ whp</div>
+        <input type="range" id="minP" min="0" max="800" value="0" step="50" oninput="updatePow()">
+        <input type="range" id="maxP" min="0" max="800" value="800" step="50" oninput="updatePow()">
+        <div class="range-labels"><span>Stock</span><span>800+ whp</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="fb-head"><div class="fb-label">Build Stage</div><span class="fb-clear" onclick="clearF('stage')">Clear</span></div>
+      <div class="fchips" id="stageF">
+        <div class="fchip active" data-v="all" onclick="setF('stage','all',this)"><span class="fdot" style="background:var(--blue)"></span>All Stages<span class="fcount">84</span></div>
+        <div class="fchip" data-v="1" onclick="setF('stage','1',this)"><span class="fdot" style="background:var(--green)"></span>Stage 1<span class="fcount">28</span></div>
+        <div class="fchip" data-v="2" onclick="setF('stage','2',this)"><span class="fdot" style="background:var(--amber)"></span>Stage 2<span class="fcount">30</span></div>
+        <div class="fchip" data-v="3" onclick="setF('stage','3',this)"><span class="fdot" style="background:var(--red)"></span>Stage 3+<span class="fcount">26</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <div class="content">
+    <div class="content-bar">
+      <div class="tab-set">
+        <button class="tab active" onclick="setTab(this,'popular')">🔥 Popular</button>
+        <button class="tab" onclick="setTab(this,'new')">✨ Newest</button>
+        <button class="tab" onclick="setTab(this,'trending')">📈 Trending</button>
+        <button class="tab" onclick="setTab(this,'featured')">⭐ Featured</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="result-cnt"><b id="rCount">12</b> builds</div>
+        <div class="view-btns">
+          <button class="vb active" onclick="setView(this,'grid')" title="Grid">▦</button>
+          <button class="vb" onclick="setView(this,'list')" title="List">≡</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" id="buildsGrid"></div>
+    <div class="load-more"><button class="load-btn" onclick="alert('Loading more builds…')">Load More Builds</button></div>
+  </div>
+</div>
+
+<script>
+const BUILDS=[
+  {id:1,make:'2021 GR Supra',user:'jdm_dreams_atl',i:'JD',type:'jdm',mod:'engine',stage:'3',hp:520,mods:['B58 Turbo','BM3 Tune','Catback','KW V3','Wagner FMIC'],badge:'hot',likes:2847,cost:'$8.4K',color:'#e83838',featured:true},
+  {id:2,make:'2015 WRX STI',user:'rally_kid_pnw',i:'RK',type:'jdm',mod:'suspension',stage:'3',hp:420,mods:['Blobeye Swap','EWG Turbo','Coilovers','Perrin'],badge:'trend',likes:1920,cost:'$12.2K',color:'#3b82f6',featured:false},
+  {id:3,make:'2019 Mustang GT',user:'mustang_mike_tx',i:'MM',type:'muscle',mod:'engine',stage:'2',hp:680,mods:['Whipple 3.0','Borla','BMR Susp.','Brembo'],badge:'hot',likes:2310,cost:'$9.8K',color:'#f59e0b',featured:true},
+  {id:4,make:'2003 Evo VIII',user:'evo_nation_dc',i:'EN',type:'jdm',mod:'engine',stage:'3',hp:490,mods:['GTX3071','EFR Manifold','ACT Clutch','Cusco'],badge:'hot',likes:3120,cost:'$14.5K',color:'#5BAAF0',featured:false},
+  {id:5,make:'2006 E46 M3',user:'euro_spec_la',i:'ES',type:'euro',mod:'suspension',stage:'2',hp:355,mods:['CSL Airbox','Meister Coils','StopTech','BBS'],badge:'trend',likes:1450,cost:'$6.2K',color:'#8b5cf6',featured:false},
+  {id:6,make:'1969 Camaro SS',user:'ls_swapped_chi',i:'LS',type:'muscle',mod:'swap',stage:'3',hp:520,mods:['LS3 Swap','T56','Custom Frame','Wilwood'],badge:'hot',likes:2680,cost:'$22K',color:'#f43f5e',featured:false},
+  {id:7,make:'2022 Civic Type R',user:'fl5_nation',i:'FL',type:'jdm',mod:'engine',stage:'1',hp:320,mods:['Injen Intake','HKS Exhaust','Koni Coils'],badge:'new',likes:980,cost:'$3.2K',color:'#22c55e',featured:false},
+  {id:8,make:'2018 Golf R',user:'mk7_mafia_atl',i:'MK',type:'euro',mod:'engine',stage:'2',hp:380,mods:['DSG Tune','Unitronic','Wagner FMIC'],badge:'trend',likes:1240,cost:'$4.8K',color:'#06b6d4',featured:false},
+  {id:9,make:'2020 Charger SRT',user:'hemi_head_fl',i:'HH',type:'muscle',mod:'engine',stage:'2',hp:600,mods:['Procharger','Ported Heads','Corsa Exhaust'],badge:'new',likes:1870,cost:'$11.4K',color:'#dc2626',featured:false},
+  {id:10,make:'2016 BRZ FA24 Swap',user:'flat6_fanatic',i:'FF',type:'jdm',mod:'swap',stage:'3',hp:340,mods:['FA24 Swap','ID Injectors','IAG Coils'],badge:'hot',likes:2100,cost:'$18K',color:'#f97316',featured:false},
+  {id:11,make:'2020 BMW M2 Comp',user:'bavaria_builds',i:'BB',type:'euro',mod:'suspension',stage:'2',hp:440,mods:['MHD S2','Akrapovic','KW DDC','CF Hood'],badge:'feat',likes:1650,cost:'$7.2K',color:'#a855f7',featured:false},
+  {id:12,make:'2004 RX-7 FD',user:'apex_rotary',i:'AR',type:'jdm',mod:'engine',stage:'3',hp:480,mods:['13B Sequential','GTX35','Trust T78','HKS EVC'],badge:'feat',likes:3400,cost:'$26K',color:'#ef4444',featured:true},
+];
+
+let currentTab='popular', currentView='grid';
+let filters={type:'all',mod:'all',stage:'all'};
+
+function drawThumb(c,color){
+  const ctx=c.getContext('2d'),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#13151d';ctx.fillRect(0,0,W,H);
+  const gr=ctx.createRadialGradient(W/2,H*.62,0,W/2,H*.62,W*.5);
+  gr.addColorStop(0,color+'24');gr.addColorStop(1,'transparent');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+  const cw=W*.7,ch=H*.3,cx=W/2-cw/2,cy=H*.43-ch/2;
+  ctx.fillStyle=color+'bb';ctx.beginPath();ctx.roundRect(cx,cy+ch*.2,cw,ch*.55,4);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+cw*.18,cy+ch*.2);ctx.lineTo(cx+cw*.28,cy);ctx.lineTo(cx+cw*.74,cy);ctx.lineTo(cx+cw*.86,cy+ch*.2);ctx.closePath();ctx.fillStyle=color+'88';ctx.fill();
+  ctx.fillStyle='rgba(160,210,255,.18)';
+  ctx.beginPath();ctx.moveTo(cx+cw*.2,cy+ch*.2);ctx.lineTo(cx+cw*.29,cy+ch*.04);ctx.lineTo(cx+cw*.52,cy+ch*.04);ctx.lineTo(cx+cw*.52,cy+ch*.2);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+cw*.54,cy+ch*.2);ctx.lineTo(cx+cw*.54,cy+ch*.04);ctx.lineTo(cx+cw*.72,cy+ch*.04);ctx.lineTo(cx+cw*.82,cy+ch*.2);ctx.closePath();ctx.fill();
+  const wr=ch*.25;
+  [[cx+cw*.2,cy+ch*.62],[cx+cw*.8,cy+ch*.62]].forEach(([wx,wy])=>{
+    ctx.beginPath();ctx.arc(wx,wy,wr,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+    ctx.strokeStyle='#222';ctx.lineWidth=1.8;ctx.stroke();
+    ctx.beginPath();ctx.arc(wx,wy,wr*.5,0,Math.PI*2);ctx.fillStyle='#555';ctx.fill();
+    for(let i=0;i<5;i++){const a=i/5*Math.PI*2;ctx.beginPath();ctx.moveTo(wx+Math.cos(a)*wr*.2,wy+Math.sin(a)*wr*.2);ctx.lineTo(wx+Math.cos(a)*wr*.44,wy+Math.sin(a)*wr*.44);ctx.strokeStyle='#888';ctx.lineWidth=1.1;ctx.stroke();}
+  });
+  ctx.beginPath();ctx.roundRect(cx+cw*.02,cy+ch*.32,cw*.07,ch*.13,2);ctx.fillStyle='rgba(255,240,150,.8)';ctx.fill();
+  ctx.beginPath();ctx.roundRect(cx+cw*.91,cy+ch*.32,cw*.07,ch*.13,2);ctx.fillStyle='rgba(255,40,40,.75)';ctx.fill();
+}
+
+function bdgLabel(b){return b==='hot'?'🔥 HOT':b==='new'?'✨ NEW':b==='trend'?'📈 TRENDING':'⭐ FEATURED'}
+
+function renderBuilds(){
+  let data=[...BUILDS];
+  if(currentTab==='popular')data.sort((a,b)=>b.likes-a.likes);
+  else if(currentTab==='new')data.sort(()=>Math.random()-.5);
+  else if(currentTab==='trending')data.sort((a,b)=>b.hp-a.hp);
+  else if(currentTab==='featured')data=data.filter(b=>b.featured);
+  if(filters.type!=='all')data=data.filter(b=>b.type===filters.type);
+  if(filters.mod!=='all')data=data.filter(b=>b.mod===filters.mod);
+  if(filters.stage!=='all')data=data.filter(b=>b.stage===filters.stage);
+  const minP=parseInt(document.getElementById('minP').value);
+  const maxP=parseInt(document.getElementById('maxP').value);
+  data=data.filter(b=>b.hp>=minP&&b.hp<=(maxP>=800?9999:maxP));
+  document.getElementById('rCount').textContent=data.length;
+  const isList=currentView==='list';
+  const grid=document.getElementById('buildsGrid');
+  grid.className=isList?'grid list':'grid';
+  grid.innerHTML=data.map((b,i)=>`
+    <div class="bc${isList?' list-card':''}">
+      ${isList?`<div class="bc-thumb-sm"><canvas id="bc${b.id}" width="320" height="200"></canvas></div>`:
+               `<div class="bc-thumb"><canvas id="bc${b.id}" width="400" height="225"></canvas><div class="bc-badges"><span class="bdg ${b.badge}">${bdgLabel(b.badge)}</span></div><div class="bc-likes">♥ ${(b.likes/1000).toFixed(1)}k</div></div>`}
+      <div class="bc-body">
+        <div class="bc-make">${b.make}</div>
+        <div class="bc-user"><span class="av">${b.i}</span>${b.user} · <span style="color:var(--blue);font-family:var(--fm);font-size:11px">${b.hp} whp</span></div>
+        <div class="bc-row">
+          <div class="bcs"><div class="bcs-val">${b.hp}</div><div class="bcs-label">WHP</div></div>
+          <div class="bcs"><div class="bcs-val">${b.mods.length}</div><div class="bcs-label">Mods</div></div>
+          <div class="bcs"><div class="bcs-val">${b.cost}</div><div class="bcs-label">Cost</div></div>
+        </div>
+        <div class="bc-mods">${b.mods.slice(0,4).map((m,j)=>`<span class="chip${j===0?' blue':''}">${m}</span>`).join('')}${b.mods.length>4?`<span class="chip">+${b.mods.length-4}</span>`:''}</div>
+      </div>
+      <div class="bc-foot">
+        <span class="bc-hp">${b.hp} whp</span>
+        <div class="bc-actions">
+          <button class="act-btn" onclick="this.textContent='♥ liked'">♥ ${(b.likes/1000).toFixed(1)}k</button>
+          <button class="act-btn" onclick="alert('Build cloned!')">📋 Clone</button>
+          <a href="build-picker.html" class="act-btn" style="text-decoration:none">View →</a>
+        </div>
+      </div>
+    </div>`).join('');
+  data.forEach(b=>{const c=document.getElementById('bc'+b.id);if(c)drawThumb(c,b.color);});
+}
+
+function setTab(el,t){document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));el.classList.add('active');currentTab=t;renderBuilds();}
+function setView(el,v){document.querySelectorAll('.vb').forEach(b=>b.classList.remove('active'));el.classList.add('active');currentView=v;renderBuilds();}
+function setF(g,v,el){document.querySelectorAll(`#${g}F .fchip`).forEach(c=>c.classList.remove('active'));el.classList.add('active');filters[g]=v;renderBuilds();}
+function clearF(g){filters[g]='all';document.querySelectorAll(`#${g}F .fchip`).forEach((c,i)=>c.classList.toggle('active',i===0));renderBuilds();}
+function updatePow(){const a=parseInt(document.getElementById('minP').value),b=parseInt(document.getElementById('maxP').value);document.getElementById('powVal').textContent=`${a} – ${b>=800?'800+':b} whp`;renderBuilds();}
+function resetPow(){document.getElementById('minP').value=0;document.getElementById('maxP').value=800;updatePow();}
+
+renderBuilds();
+</script>
+</body>
+</html>

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CarBuilding101 — My Garage</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#5BAAF0;--blue-dark:#2e86d4;--blue-glow:rgba(91,170,240,0.12);
+  --black:#08090b;--dark:#0d0e14;--surface:#13151d;--s2:#191c28;--s3:#1e2232;
+  --border:rgba(255,255,255,0.08);--b2:rgba(91,170,240,0.24);--b3:rgba(255,255,255,0.13);
+  --text:#eeedf2;--muted:#7e7d8e;--subtle:#28273a;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --ff:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;overflow-x:hidden}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;background:rgba(8,9,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--ff);font-size:20px;letter-spacing:2px;color:var(--text);text-decoration:none}.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:20px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-xs{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.btn-ghost:hover{border-color:var(--b2)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+
+/* PROFILE HERO */
+.profile-hero{margin-top:58px;background:var(--dark);border-bottom:1px solid var(--border)}
+.banner{height:140px;background:linear-gradient(135deg,#0c1a30,#101e38,#090e1c);position:relative;overflow:hidden}
+.banner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(91,170,240,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(91,170,240,.05) 1px,transparent 1px);background-size:36px 36px}
+.banner-edit{position:absolute;top:10px;right:12px;background:rgba(8,9,11,.6);border:1px solid var(--b3);color:var(--muted);padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.banner-edit:hover{border-color:var(--b2);color:var(--text)}
+.profile-info{padding:0 36px 24px;position:relative}
+.avatar-wrap{position:absolute;top:-36px;left:36px}
+.avatar{width:76px;height:76px;border-radius:50%;background:var(--s2);border:3px solid var(--dark);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.avatar canvas{width:100%;height:100%;display:block;border-radius:50%}
+.online-dot{position:absolute;bottom:3px;right:3px;width:16px;height:16px;border-radius:50%;background:var(--green);border:2px solid var(--dark)}
+.profile-top{display:flex;align-items:flex-start;justify-content:space-between;padding-top:44px;flex-wrap:wrap;gap:12px}
+.profile-name{font-family:var(--ff);font-size:28px;letter-spacing:1px;line-height:1;margin-bottom:3px}
+.profile-handle{font-size:13px;color:var(--muted);font-family:var(--fm);margin-bottom:8px}
+.profile-bio{font-size:13px;color:var(--muted);font-weight:300;max-width:440px;line-height:1.6}
+.profile-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ptag{font-size:10px;font-family:var(--fm);padding:2px 9px;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.ptag.blue{border-color:var(--b2);color:var(--blue);background:var(--blue-glow)}
+.profile-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+.profile-stats{display:flex;gap:24px;padding:16px 36px;border-top:1px solid var(--border);flex-wrap:wrap}
+.pstat-val{font-family:var(--ff);font-size:24px;letter-spacing:1px;color:var(--blue);line-height:1}
+.pstat-label{font-size:10px;color:var(--muted);font-family:var(--fm);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* TABS */
+.profile-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 36px;background:var(--dark);overflow-x:auto}
+.ptab{padding:13px 18px;font-size:13px;font-weight:500;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;color:var(--muted);background:none;border-top:none;border-left:none;border-right:none;font-family:var(--fb);white-space:nowrap;display:flex;align-items:center;gap:5px}
+.ptab:hover{color:var(--text)}
+.ptab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.ptab-cnt{font-size:10px;font-family:var(--fm);background:var(--surface);padding:1px 6px;border-radius:8px;border:1px solid var(--border)}
+
+/* PAGE */
+.page{display:grid;grid-template-columns:1fr 270px}
+.main-content{padding:24px 36px;display:flex;flex-direction:column;gap:20px}
+
+/* CAR CARDS */
+.cars-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cc{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .22s;position:relative}
+.cc:hover{border-color:var(--b2);transform:translateY(-2px)}
+.cc.primary{border-color:var(--b2)}
+.primary-tag{position:absolute;top:8px;right:8px;font-size:9px;font-family:var(--fm);letter-spacing:1.5px;color:var(--blue);background:var(--blue-glow);border:1px solid var(--b2);padding:2px 8px;border-radius:3px;z-index:2}
+.cc-thumb{width:100%;aspect-ratio:16/8;background:var(--s2);overflow:hidden}
+.cc-thumb canvas{width:100%;height:100%;display:block}
+.cc-body{padding:14px 16px}
+.cc-make{font-family:var(--ff);font-size:19px;letter-spacing:1px;margin-bottom:3px}
+.cc-sub{font-size:11px;color:var(--muted);margin-bottom:10px}
+.cc-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}
+.ccs{background:var(--s2);border-radius:5px;padding:6px 8px;text-align:center}
+.ccs-val{font-family:var(--fm);font-size:12px;color:var(--blue)}
+.ccs-label{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.cc-mods{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.chip{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--s2);border:1px solid var(--border);color:var(--muted)}
+.chip.blue{border-color:var(--b2);color:var(--blue);background:var(--blue-glow)}
+.cc-prog-bar{height:4px;background:var(--subtle);border-radius:2px;overflow:hidden;margin-bottom:8px}
+.cc-prog-fill{height:100%;background:var(--blue);border-radius:2px}
+.cc-footer{display:flex;gap:6px;padding:10px 16px;border-top:1px solid var(--border)}
+.cc-btn{flex:1;background:var(--s2);border:1px solid var(--border);color:var(--text);padding:7px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb);transition:all .2s;text-align:center;text-decoration:none;display:flex;align-items:center;justify-content:center}
+.cc-btn:hover{border-color:var(--b2);color:var(--blue)}
+.cc-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}.cc-btn.primary:hover{background:var(--blue-dark)}
+.cc-add{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;border-style:dashed;cursor:pointer}
+.cc-add:hover{border-color:var(--blue);background:var(--blue-glow)}
+
+/* Wishlist */
+.wishlist{display:flex;flex-direction:column;gap:6px}
+.wi{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:9px;gap:10px;transition:all .2s}
+.wi:hover{border-color:var(--b2)}
+.wi-icon{font-size:18px;width:32px;height:32px;background:var(--s2);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.wi-name{font-size:13px;font-weight:500;margin-bottom:1px}
+.wi-sub{font-size:11px;color:var(--muted)}
+.wi-right{text-align:right;flex-shrink:0}
+.wi-price{font-family:var(--ff);font-size:17px;letter-spacing:.5px;color:var(--blue)}
+.wi-status{font-size:10px;font-family:var(--fm);padding:2px 7px;border-radius:3px}
+.wi-ok{background:rgba(34,197,94,.1);color:var(--green)}
+.wi-drop{background:rgba(239,68,68,.1);color:var(--red)}
+
+/* Activity */
+.activity{display:flex;flex-direction:column;gap:0}
+.act{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.act:last-child{border-bottom:none}
+.act-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;margin-top:2px}
+.ai-blue{background:var(--blue-glow);border:1px solid var(--b2)}
+.ai-green{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2)}
+.ai-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2)}
+.act-text{font-size:13px;line-height:1.5}.act-text b{color:var(--text)}
+.act-time{font-size:10px;color:var(--muted);font-family:var(--fm);margin-top:2px}
+
+/* SIDEBAR */
+.sidebar{background:var(--dark);border-left:1px solid var(--border);padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.sb-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px}
+.sb-title{font-size:10px;font-family:var(--fm);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.prog-track{height:4px;background:var(--subtle);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--blue);border-radius:2px}
+.badge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.badge-item{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:8px 6px;text-align:center;transition:all .2s}
+.badge-item:hover{border-color:var(--b2)}
+.badge-item.earned{border-color:var(--b2);background:var(--blue-glow)}
+.badge-item.locked{opacity:.3}
+.badge-emoji{font-size:20px;margin-bottom:3px}
+.badge-label{font-size:9px;font-family:var(--fm);letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+.badge-item.earned .badge-label{color:var(--blue)}
+.fol-list{display:flex;flex-direction:column;gap:7px}
+.fol{display:flex;align-items:center;gap:8px}
+.fol-av{width:28px;height:28px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--blue);border:1px solid var(--b2);flex-shrink:0}
+.fol-name{font-size:12px;font-weight:500;flex:1}
+.fol-car{font-size:10px;color:var(--muted)}
+.fol-btn{font-size:10px;border:1px solid var(--b2);color:var(--blue);background:var(--blue-glow);padding:3px 8px;border-radius:3px;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.fol-btn:hover{background:var(--blue);color:#fff}
+.sec-title{font-family:var(--ff);font-size:20px;letter-spacing:1px;margin-bottom:3px}
+.sec-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+
+@media(max-width:1000px){.page{grid-template-columns:1fr}.sidebar{border-left:none;border-top:1px solid var(--border)}}
+@media(max-width:650px){.profile-info{padding:0 16px 18px}.profile-stats{padding:14px 16px;gap:16px}.main-content{padding:16px}.cars-grid{grid-template-columns:1fr}.profile-tabs{padding:0 12px}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="logo">CAR<span>BUILDING</span>101</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="community.html">Community</a></li>
+    <li><a href="build-picker.html">Build Tool</a></li>
+    <li><a href="garage.html" class="active">Garage</a></li>
+    <li><a href="viewer.html">3D Viewer</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="build-picker.html" class="btn-xs btn-blue">+ New Build</a>
+  </div>
+</nav>
+
+<div class="profile-hero">
+  <div class="banner">
+    <button class="banner-edit">✏️ Edit Banner</button>
+  </div>
+  <div class="profile-info">
+    <div class="avatar-wrap">
+      <div class="avatar"><canvas id="avatarC" width="76" height="76"></canvas></div>
+      <div class="online-dot"></div>
+    </div>
+    <div class="profile-top">
+      <div>
+        <div class="profile-name">JDM Dreams ATL</div>
+        <div class="profile-handle">@jdm_dreams_atl</div>
+        <div class="profile-bio">Built 3 cars from scratch. B58 enthusiast. Stage 3 Supra owner. Atlanta, GA 🍑</div>
+        <div class="profile-tags">
+          <span class="ptag blue">🏁 Stage 3 Builder</span>
+          <span class="ptag">JDM</span><span class="ptag">RWD Only</span><span class="ptag">B58 Platform</span><span class="ptag">Atlanta, GA</span>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn-xs btn-ghost">✏️ Edit Profile</button>
+        <button class="btn-xs btn-blue">📤 Share Garage</button>
+      </div>
+    </div>
+  </div>
+  <div class="profile-stats">
+    <div><div class="pstat-val">3</div><div class="pstat-label">Cars</div></div>
+    <div><div class="pstat-val">847</div><div class="pstat-label">Followers</div></div>
+    <div><div class="pstat-val">124</div><div class="pstat-label">Following</div></div>
+    <div><div class="pstat-val">12</div><div class="pstat-label">Builds Posted</div></div>
+    <div><div class="pstat-val">2.8k</div><div class="pstat-label">Likes</div></div>
+    <div><div class="pstat-val">$24K</div><div class="pstat-label">Build Value</div></div>
+  </div>
+</div>
+
+<div class="profile-tabs">
+  <button class="ptab active" onclick="showTab(this,'cars')">🚗 My Cars <span class="ptab-cnt">3</span></button>
+  <button class="ptab" onclick="showTab(this,'wishlist')">⭐ Wishlist <span class="ptab-cnt">6</span></button>
+  <button class="ptab" onclick="showTab(this,'activity')">⚡ Activity</button>
+  <button class="ptab" onclick="showTab(this,'shared')">📸 Shared <span class="ptab-cnt">12</span></button>
+</div>
+
+<div class="page">
+  <div class="main-content">
+
+    <!-- CARS TAB -->
+    <div id="tab-cars">
+      <div class="sec-title">My Garage</div>
+      <div class="sec-sub">Your cars and active builds</div>
+      <div class="cars-grid">
+        <div class="cc primary">
+          <span class="primary-tag">PRIMARY</span>
+          <div class="cc-thumb"><canvas id="cc1" width="400" height="200"></canvas></div>
+          <div class="cc-body">
+            <div class="cc-make">2021 GR Supra</div>
+            <div class="cc-sub">3.0L B58 Turbo · RWD · Stage 3</div>
+            <div class="cc-row">
+              <div class="ccs"><div class="ccs-val">520</div><div class="ccs-label">WHP</div></div>
+              <div class="ccs"><div class="ccs-val">12</div><div class="ccs-label">Mods</div></div>
+              <div class="ccs"><div class="ccs-val">$8.4K</div><div class="ccs-label">Spent</div></div>
+            </div>
+            <div class="cc-mods"><span class="chip blue">B58 Turbo</span><span class="chip">BM3 Tune</span><span class="chip">VRSF DP</span><span class="chip">Akra</span><span class="chip">+8</span></div>
+          </div>
+          <div class="cc-footer">
+            <a href="viewer.html" class="cc-btn primary">🚗 3D View</a>
+            <a href="build-picker.html" class="cc-btn">🔧 Edit</a>
+            <button class="cc-btn" onclick="alert('Share link copied!')">📤</button>
+          </div>
+        </div>
+
+        <div class="cc">
+          <div class="cc-thumb"><canvas id="cc2" width="400" height="200"></canvas></div>
+          <div class="cc-body">
+            <div class="cc-make">2019 Mustang GT</div>
+            <div class="cc-sub">5.0L Coyote V8 · RWD · Stage 2</div>
+            <div class="cc-row">
+              <div class="ccs"><div class="ccs-val">480</div><div class="ccs-label">WHP</div></div>
+              <div class="ccs"><div class="ccs-val">7</div><div class="ccs-label">Mods</div></div>
+              <div class="ccs"><div class="ccs-val">$5.2K</div><div class="ccs-label">Spent</div></div>
+            </div>
+            <div class="cc-mods"><span class="chip blue">Procharger</span><span class="chip">Borla</span><span class="chip">BMR Susp.</span><span class="chip">+4</span></div>
+          </div>
+          <div class="cc-footer">
+            <a href="viewer.html" class="cc-btn primary">🚗 3D View</a>
+            <a href="build-picker.html" class="cc-btn">🔧 Edit</a>
+            <button class="cc-btn" onclick="alert('Share link copied!')">📤</button>
+          </div>
+        </div>
+
+        <div class="cc">
+          <div class="cc-thumb"><canvas id="cc3" width="400" height="200"></canvas></div>
+          <div class="cc-body">
+            <div class="cc-make">2003 Evo VIII</div>
+            <div class="cc-sub">2.0L 4B11T · AWD · In Progress</div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px"><span>Stage 3 Progress</span><span style="color:var(--blue)">24%</span></div>
+            <div class="cc-prog-bar"><div class="cc-prog-fill" style="width:24%"></div></div>
+            <div class="cc-mods"><span class="chip blue">Garrett GTX3071</span><span class="chip">EFR Manifold</span><span class="chip">Plan: 490whp</span></div>
+          </div>
+          <div class="cc-footer">
+            <a href="build-picker.html" class="cc-btn primary">🔧 Continue Build</a>
+            <button class="cc-btn">📋 View Plan</button>
+          </div>
+        </div>
+
+        <div class="cc cc-add" onclick="location.href='build-picker.html'">
+          <div style="font-size:32px;opacity:.3;margin-bottom:10px">➕</div>
+          <div style="font-size:13px;color:var(--muted);font-weight:500">Add Another Car</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WISHLIST TAB -->
+    <div id="tab-wishlist" style="display:none">
+      <div class="sec-title">Wishlist</div>
+      <div class="sec-sub">Tracking prices — alerts sent when parts drop</div>
+      <div class="wishlist">
+        <div class="wi"><div class="wi-icon">🌀</div><div><div class="wi-name">Pure Stage 2 Turbo (B58)</div><div class="wi-sub">Pure Turbos · Engine · Supra 2021</div></div><div class="wi-right"><div class="wi-price">$2,800</div><div class="wi-status wi-ok">Stable</div></div></div>
+        <div class="wi"><div class="wi-icon">⭕</div><div><div class="wi-name">Volk TE37 SL 18x10.5 +15</div><div class="wi-sub">Rays Engineering · Wheels · Supra</div></div><div class="wi-right"><div class="wi-price">$3,200</div><div class="wi-status wi-drop">🔴 -$180</div></div></div>
+        <div class="wi"><div class="wi-icon">❄️</div><div><div class="wi-name">Wagner EVO 3 FMIC</div><div class="wi-sub">Wagner Tuning · Intercooler · Supra</div></div><div class="wi-right"><div class="wi-price">$920</div><div class="wi-status wi-ok">Stable</div></div></div>
+        <div class="wi"><div class="wi-icon">🛑</div><div><div class="wi-name">StopTech BBK (Front)</div><div class="wi-sub">StopTech · Brakes · Mustang GT</div></div><div class="wi-right"><div class="wi-price">$1,450</div><div class="wi-status wi-drop">🔴 -$95</div></div></div>
+        <div class="wi"><div class="wi-icon">💻</div><div><div class="wi-name">EcuTek Flex Fuel Kit</div><div class="wi-sub">EcuTek · Tune · Evo VIII</div></div><div class="wi-right"><div class="wi-price">$480</div><div class="wi-status wi-ok">Stable</div></div></div>
+        <div class="wi"><div class="wi-icon">🔩</div><div><div class="wi-name">KW V3 Coilover Kit</div><div class="wi-sub">KW Suspension · Evo VIII</div></div><div class="wi-right"><div class="wi-price">$2,100</div><div class="wi-status wi-ok">Stable</div></div></div>
+      </div>
+    </div>
+
+    <!-- ACTIVITY TAB -->
+    <div id="tab-activity" style="display:none">
+      <div class="sec-title">Recent Activity</div>
+      <div class="sec-sub">Your build history and interactions</div>
+      <div class="activity">
+        <div class="act"><div class="act-icon ai-blue">🔧</div><div><div class="act-text">You added <b>Pure Stage 2 Turbo</b> to your Supra build</div><div class="act-time">2 hours ago</div></div></div>
+        <div class="act"><div class="act-icon ai-green">♥</div><div><div class="act-text"><b>rally_kid_pnw</b> liked your Supra Stage 3 build</div><div class="act-time">4 hours ago</div></div></div>
+        <div class="act"><div class="act-icon ai-blue">💬</div><div><div class="act-text"><b>evo_nation_dc</b> commented: "What turbo are you running? Asking for my Evo 😂"</div><div class="act-time">6 hours ago</div></div></div>
+        <div class="act"><div class="act-icon ai-amber">⚠️</div><div><div class="act-text">Compatibility warning: <b>VRSF Catless Downpipe</b> may require tune on your Supra</div><div class="act-time">Yesterday</div></div></div>
+        <div class="act"><div class="act-icon ai-green">📋</div><div><div class="act-text"><b>mustang_mike_tx</b> cloned your Supra build</div><div class="act-time">2 days ago</div></div></div>
+        <div class="act"><div class="act-icon ai-amber">💰</div><div><div class="act-text">Price drop: <b>Volk TE37 SL</b> dropped $180 at Enjuku Racing</div><div class="act-time">3 days ago</div></div></div>
+        <div class="act"><div class="act-icon ai-blue">🏆</div><div><div class="act-text">You earned the <b>Stage 3 Builder</b> badge</div><div class="act-time">1 week ago</div></div></div>
+      </div>
+    </div>
+
+    <!-- SHARED TAB -->
+    <div id="tab-shared" style="display:none">
+      <div class="sec-title">Shared Builds</div>
+      <div class="sec-sub">Builds you've posted to the community</div>
+      <div class="wishlist">
+        <div class="wi"><div class="wi-icon">🚗</div><div><div class="wi-name">2021 GR Supra — Stage 3</div><div class="wi-sub">520 whp · 12 mods · 2 weeks ago</div></div><div class="wi-right"><div class="wi-price" style="font-size:14px">2,847 ♥</div><div style="font-size:11px;color:var(--muted)">142 clones</div></div></div>
+        <div class="wi"><div class="wi-icon">🚗</div><div><div class="wi-name">2019 Mustang GT — Stage 2</div><div class="wi-sub">480 whp · 7 mods · 1 month ago</div></div><div class="wi-right"><div class="wi-price" style="font-size:14px">1,204 ♥</div><div style="font-size:11px;color:var(--muted)">68 clones</div></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-card">
+      <div class="sb-title">Builder Level</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <div style="font-size:26px">🏆</div>
+        <div><div style="font-family:var(--ff);font-size:18px;letter-spacing:1px;color:var(--blue)">Stage 3 Builder</div><div style="font-size:11px;color:var(--muted)">Level 7 · 2,840 XP</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:5px"><span>Next: Pro Builder</span><span style="color:var(--blue)">2,840 / 5,000</span></div>
+      <div class="prog-track"><div class="prog-fill" style="width:57%"></div></div>
+    </div>
+
+    <div class="sb-card">
+      <div class="sb-title">Badges</div>
+      <div class="badge-grid">
+        <div class="badge-item earned"><div class="badge-emoji">🏁</div><div class="badge-label">Stage 3</div></div>
+        <div class="badge-item earned"><div class="badge-emoji">🔧</div><div class="badge-label">12 Mods</div></div>
+        <div class="badge-item earned"><div class="badge-emoji">🔥</div><div class="badge-label">Trending</div></div>
+        <div class="badge-item earned"><div class="badge-emoji">💰</div><div class="badge-label">$10K Club</div></div>
+        <div class="badge-item earned"><div class="badge-emoji">📸</div><div class="badge-label">Shared</div></div>
+        <div class="badge-item locked"><div class="badge-emoji">🏆</div><div class="badge-label">Pro Builder</div></div>
+        <div class="badge-item locked"><div class="badge-emoji">⭐</div><div class="badge-label">Featured</div></div>
+        <div class="badge-item locked"><div class="badge-emoji">👑</div><div class="badge-label">Legend</div></div>
+        <div class="badge-item locked"><div class="badge-emoji">🌀</div><div class="badge-label">Turbo God</div></div>
+      </div>
+    </div>
+
+    <div class="sb-card">
+      <div class="sb-title">Followers</div>
+      <div class="fol-list">
+        <div class="fol"><div class="fol-av">RK</div><div><div class="fol-name">rally_kid_pnw</div><div class="fol-car">WRX STI · 420 whp</div></div><button class="fol-btn">Follow</button></div>
+        <div class="fol"><div class="fol-av">EN</div><div><div class="fol-name">evo_nation_dc</div><div class="fol-car">Evo VIII · 490 whp</div></div><button class="fol-btn">Follow</button></div>
+        <div class="fol"><div class="fol-av">FL</div><div><div class="fol-name">fl5_nation</div><div class="fol-car">Civic Type R · 320 whp</div></div><button class="fol-btn">Follow</button></div>
+        <div class="fol"><div class="fol-av">MM</div><div><div class="fol-name">mustang_mike_tx</div><div class="fol-car">Mustang GT · 680 whp</div></div><button class="fol-btn">Follow</button></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+function showTab(btn,tab){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  ['cars','wishlist','activity','shared'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el)el.style.display=t===tab?'':'none';
+  });
+}
+
+function drawCar(id,color){
+  const c=document.getElementById(id);if(!c)return;
+  const ctx=c.getContext('2d'),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#13151d';ctx.fillRect(0,0,W,H);
+  const gr=ctx.createRadialGradient(W/2,H*.65,0,W/2,H*.65,W*.5);
+  gr.addColorStop(0,color+'22');gr.addColorStop(1,'transparent');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+  const cw=W*.7,ch=H*.36,cx=W/2-cw/2,cy=H*.43-ch/2;
+  ctx.fillStyle=color+'bb';ctx.beginPath();ctx.roundRect(cx,cy+ch*.2,cw,ch*.55,4);ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+cw*.18,cy+ch*.2);ctx.lineTo(cx+cw*.28,cy);ctx.lineTo(cx+cw*.74,cy);ctx.lineTo(cx+cw*.86,cy+ch*.2);ctx.closePath();ctx.fillStyle=color+'88';ctx.fill();
+  ctx.fillStyle='rgba(160,210,255,.18)';
+  ctx.beginPath();ctx.moveTo(cx+cw*.2,cy+ch*.2);ctx.lineTo(cx+cw*.29,cy+ch*.04);ctx.lineTo(cx+cw*.52,cy+ch*.04);ctx.lineTo(cx+cw*.52,cy+ch*.2);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(cx+cw*.54,cy+ch*.2);ctx.lineTo(cx+cw*.54,cy+ch*.04);ctx.lineTo(cx+cw*.72,cy+ch*.04);ctx.lineTo(cx+cw*.82,cy+ch*.2);ctx.closePath();ctx.fill();
+  const wr=ch*.25;
+  [[cx+cw*.2,cy+ch*.62],[cx+cw*.8,cy+ch*.62]].forEach(([wx,wy])=>{
+    ctx.beginPath();ctx.arc(wx,wy,wr,0,Math.PI*2);ctx.fillStyle='#111';ctx.fill();
+    ctx.strokeStyle='#222';ctx.lineWidth=1.8;ctx.stroke();
+    ctx.beginPath();ctx.arc(wx,wy,wr*.5,0,Math.PI*2);ctx.fillStyle='#555';ctx.fill();
+    for(let i=0;i<5;i++){const a=i/5*Math.PI*2;ctx.beginPath();ctx.moveTo(wx+Math.cos(a)*wr*.2,wy+Math.sin(a)*wr*.2);ctx.lineTo(wx+Math.cos(a)*wr*.44,wy+Math.sin(a)*wr*.44);ctx.strokeStyle='#888';ctx.lineWidth=1.1;ctx.stroke();}
+  });
+  ctx.beginPath();ctx.roundRect(cx+cw*.02,cy+ch*.32,cw*.07,ch*.12,2);ctx.fillStyle='rgba(255,240,150,.8)';ctx.fill();
+  ctx.beginPath();ctx.roundRect(cx+cw*.91,cy+ch*.32,cw*.07,ch*.12,2);ctx.fillStyle='rgba(255,40,40,.75)';ctx.fill();
+}
+
+function drawAvatar(){
+  const c=document.getElementById('avatarC');if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#1e2232';ctx.fillRect(0,0,76,76);
+  const gr=ctx.createRadialGradient(38,38,0,38,38,38);
+  gr.addColorStop(0,'rgba(91,170,240,.2)');gr.addColorStop(1,'transparent');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,76,76);
+  ctx.fillStyle='#5BAAF0';ctx.font='bold 28px Bebas Neue,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText('JD',38,40);
+}
+
+drawCar('cc1','#e83838');
+drawCar('cc2','#f59e0b');
+drawCar('cc3','#5BAAF0');
+drawAvatar();
+</script>
+</body>
+</html>
