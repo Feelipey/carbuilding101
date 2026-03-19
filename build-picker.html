@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CarBuilding101 — Build Picker</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#5BAAF0;--blue-dark:#2e86d4;--blue-glow:rgba(91,170,240,0.12);--blue-mid:rgba(91,170,240,0.2);
+  --black:#08090b;--dark:#0d0e14;--surface:#13151d;--s2:#191c28;--s3:#1e2232;
+  --border:rgba(255,255,255,0.07);--b2:rgba(91,170,240,0.22);--b3:rgba(255,255,255,0.13);
+  --text:#eeedf2;--muted:#7e7d8e;--subtle:#28273a;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;
+  --ff:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:3px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 36px;height:60px;background:rgba(8,9,11,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--ff);font-size:22px;letter-spacing:2px;color:var(--text);text-decoration:none}.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:24px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.btn-sm{padding:7px 16px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.btn-ghost:hover{border-color:var(--b2);background:var(--surface)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+
+/* LAYOUT */
+.page{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 60px);margin-top:60px}
+
+/* LEFT SIDEBAR */
+.sidebar{background:var(--dark);border-right:1px solid var(--border);padding:28px 24px;position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto;display:flex;flex-direction:column;gap:24px}
+::-webkit-scrollbar{width:4px}
+
+.sb-section{display:flex;flex-direction:column;gap:10px}
+.sb-label{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+
+/* Step indicator */
+.steps-track{display:flex;flex-direction:column;gap:0}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;position:relative}
+.step-item:not(:last-child)::after{content:'';position:absolute;left:13px;top:32px;bottom:0;width:1px;background:var(--border)}
+.step-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;z-index:1;transition:all .3s}
+.step-dot.done{background:var(--blue);color:#fff}
+.step-dot.active{background:var(--blue-glow);border:2px solid var(--blue);color:var(--blue)}
+.step-dot.idle{background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+.step-info{}
+.step-title{font-size:13px;font-weight:600;line-height:1.2}
+.step-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Car search */
+.search-box{position:relative}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.search-input{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px 10px 34px;color:var(--text);font-family:var(--fb);font-size:14px;outline:none;transition:border-color .2s}
+.search-input:focus{border-color:var(--blue)}
+.search-input::placeholder{color:var(--subtle)}
+
+.sel-group{display:flex;flex-direction:column;gap:8px}
+.sel{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:var(--fb);font-size:14px;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238a8790' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+.sel:focus{border-color:var(--blue)}
+.sel option{background:var(--s2);color:var(--text)}
+
+/* Selected car card */
+.car-card{background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:14px;display:none}
+.car-card.show{display:block}
+.car-card-make{font-family:var(--ff);font-size:24px;letter-spacing:1px;line-height:1;margin-bottom:4px}
+.car-card-details{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.car-tag{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:3px;background:var(--surface);border:1px solid var(--border);color:var(--muted)}
+
+/* Build summary */
+.build-summary{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px}
+.bs-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px}
+.bs-row:last-child{border-bottom:none}
+.bs-key{color:var(--muted)}
+.bs-val{font-weight:600;font-family:var(--fm);font-size:12px}
+.bs-val.blue{color:var(--blue)}.bs-val.green{color:var(--green)}.bs-val.amber{color:var(--amber)}
+.total-box{background:var(--blue-glow);border:1px solid var(--b2);border-radius:8px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.total-num{font-family:var(--ff);font-size:30px;letter-spacing:1px;color:var(--blue)}
+
+/* MAIN AREA */
+.main{padding:28px 32px;display:flex;flex-direction:column;gap:28px}
+
+/* Cat tabs */
+.cat-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.cat-tab{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--muted);transition:all .2s;display:flex;align-items:center;gap:6px}
+.cat-tab:hover{border-color:var(--b2);color:var(--text)}
+.cat-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.cat-count{font-size:10px;font-family:var(--fm);background:rgba(255,255,255,0.15);padding:1px 6px;border-radius:10px}
+
+/* Parts grid */
+.parts-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.parts-title{font-family:var(--ff);font-size:28px;letter-spacing:1px}
+.parts-filter-row{display:flex;align-items:center;gap:10px}
+.filter-sel{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:7px 12px;color:var(--text);font-family:var(--fb);font-size:13px;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none}
+.filter-sel:focus{border-color:var(--blue)}
+.filter-sel option{background:var(--s2)}
+
+.parts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+
+.part-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+.part-card:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-2px)}
+.part-card.added{border-color:var(--blue);background:var(--blue-glow)}
+.part-card.added::after{content:'✓ Added';position:absolute;top:12px;right:12px;font-size:10px;font-family:var(--fm);color:var(--blue);letter-spacing:1px}
+.part-card.incompatible{opacity:.45;border-style:dashed}
+.part-card.incompatible::after{content:'✕ Incompatible';position:absolute;top:12px;right:12px;font-size:10px;font-family:var(--fm);color:var(--red);letter-spacing:1px}
+
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.pc-icon{font-size:22px}
+.pc-badge{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:3px;letter-spacing:.5px}
+.compat-ok{background:rgba(34,197,94,.12);color:var(--green)}
+.compat-warn{background:rgba(245,158,11,.12);color:var(--amber)}
+.compat-no{background:rgba(239,68,68,.1);color:var(--red)}
+.compat-req{background:rgba(91,170,240,.12);color:var(--blue)}
+
+.pc-name{font-size:16px;font-weight:600;margin-bottom:4px}
+.pc-brand{font-size:12px;color:var(--muted);margin-bottom:12px}
+.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.pc-stat{background:var(--s2);border-radius:6px;padding:7px 10px}
+.pc-stat-label{font-size:10px;color:var(--muted);font-family:var(--fm);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px}
+.pc-stat-val{font-size:13px;font-weight:600}
+.pc-stat-val.green{color:var(--green)}.pc-stat-val.amber{color:var(--amber)}.pc-stat-val.blue{color:var(--blue)}
+
+.pc-footer{display:flex;align-items:center;justify-content:space-between}
+.pc-price{font-family:var(--ff);font-size:22px;letter-spacing:1px;color:var(--blue)}
+.add-btn{background:var(--blue);color:#fff;border:none;padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:all .2s}
+.add-btn:hover{background:var(--blue-dark)}
+.add-btn.added{background:var(--s3);color:var(--muted);cursor:default}
+
+/* BUILD LIST PANEL (right drawer feel) */
+.build-tray{position:fixed;right:0;top:60px;bottom:0;width:320px;background:var(--dark);border-left:1px solid var(--border);transform:translateX(100%);transition:transform .3s ease;z-index:150;display:flex;flex-direction:column;padding:24px}
+.build-tray.open{transform:translateX(0)}
+.tray-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.tray-title{font-family:var(--ff);font-size:26px;letter-spacing:1px}
+.tray-close{background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;transition:color .2s}.tray-close:hover{color:var(--text)}
+.tray-items{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px}
+.tray-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.ti-name{font-size:13px;font-weight:500;flex:1}
+.ti-price{font-family:var(--fm);font-size:11px;color:var(--blue)}
+.ti-remove{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;transition:color .2s;padding:2px 6px;border-radius:4px}.ti-remove:hover{color:var(--red);background:rgba(239,68,68,.08)}
+.tray-total{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.tray-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tray-total-label{color:var(--muted);font-size:13px}
+.tray-total-val{font-family:var(--ff);font-size:32px;letter-spacing:1px;color:var(--blue)}
+.tray-cta{width:100%;background:var(--blue);color:#fff;border:none;padding:13px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--fb);transition:background .2s}
+.tray-cta:hover{background:var(--blue-dark)}
+
+/* Float build btn */
+.float-btn{position:fixed;bottom:28px;right:28px;background:var(--blue);color:#fff;border:none;padding:13px 22px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--fb);box-shadow:0 8px 32px rgba(91,170,240,.3);transition:all .2s;z-index:100;display:flex;align-items:center;gap:8px}
+.float-btn:hover{background:var(--blue-dark);transform:translateY(-2px)}
+.float-count{background:rgba(255,255,255,.25);padding:1px 8px;border-radius:10px;font-size:12px}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:48px;margin-bottom:16px;opacity:.4}
+.empty-text{font-size:16px;margin-bottom:6px}
+.empty-sub{font-size:13px;opacity:.7}
+
+/* Conflict warning */
+.conflict-bar{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--amber)}
+.conflict-bar .icon{font-size:16px;flex-shrink:0}
+
+@media(max-width:900px){.page{grid-template-columns:1fr}.sidebar{position:static;height:auto}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="carbuilding101.html" class="logo">CAR<span>BUILDING</span>101</a>
+  <ul class="nav-links">
+    <li><a href="carbuilding101.html">Home</a></li>
+    <li><a href="community.html">Community</a></li>
+    <li><a href="garage.html">My Garage</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="#" class="btn-sm btn-ghost">Log In</a>
+    <button class="btn-sm btn-blue" onclick="toggleTray()">My Build <span id="navCount" style="background:rgba(255,255,255,.2);padding:1px 7px;border-radius:10px;font-size:11px">0</span></button>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Build Progress</div>
+      <div class="steps-track">
+        <div class="step-item">
+          <div class="step-dot done" id="s1dot">✓</div>
+          <div class="step-info"><div class="step-title">Select Your Car</div><div class="step-sub" id="s1sub">Choose year, make, model</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot active" id="s2dot">2</div>
+          <div class="step-info"><div class="step-title">Add Modifications</div><div class="step-sub">Browse &amp; add parts</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot idle" id="s3dot">3</div>
+          <div class="step-info"><div class="step-title">Verify Compatibility</div><div class="step-sub">Check for conflicts</div></div>
+        </div>
+        <div class="step-item">
+          <div class="step-dot idle" id="s4dot">4</div>
+          <div class="step-info"><div class="step-title">Share &amp; Buy</div><div class="step-sub">Post build or buy parts</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-label">Find Your Car</div>
+      <div class="sel-group">
+        <select class="sel" id="selYear" onchange="updateCar()">
+          <option value="">Year</option>
+          <option>2024</option><option>2023</option><option>2022</option><option selected>2021</option>
+          <option>2020</option><option>2019</option><option>2018</option><option>2017</option>
+          <option>2016</option><option>2015</option><option>2013</option><option>2010</option>
+          <option>2008</option><option>2006</option><option>2003</option><option>2000</option>
+        </select>
+        <select class="sel" id="selMake" onchange="updateModel()">
+          <option value="">Make</option>
+          <option>Toyota</option><option>Honda</option><option>Subaru</option><option>Mitsubishi</option>
+          <option>Nissan</option><option>Ford</option><option>Chevrolet</option><option>Dodge</option>
+          <option>BMW</option><option>Volkswagen</option><option>Mazda</option><option>Acura</option>
+        </select>
+        <select class="sel" id="selModel" onchange="updateCar()">
+          <option value="">Model</option>
+        </select>
+        <select class="sel" id="selTrim" onchange="updateCar()">
+          <option value="">Trim (optional)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="car-card" id="carCard">
+      <div class="car-card-make" id="carCardMake">2021 GR Supra</div>
+      <div style="font-size:12px;color:var(--muted)" id="carCardSub">3.0L Inline-6 Turbo · RWD · Manual</div>
+      <div class="car-card-details" id="carCardTags"></div>
+    </div>
+
+    <div class="sb-section" id="summarySection" style="display:none">
+      <div class="sb-label">Build Summary</div>
+      <div class="build-summary">
+        <div class="bs-row"><span class="bs-key">Parts Added</span><span class="bs-val blue" id="sumParts">0</span></div>
+        <div class="bs-row"><span class="bs-key">Est. HP Gain</span><span class="bs-val amber" id="sumHp">+0 whp</span></div>
+        <div class="bs-row"><span class="bs-key">Compatibility</span><span class="bs-val green" id="sumCompat">—</span></div>
+        <div class="bs-row"><span class="bs-key">Tune Needed</span><span class="bs-val" id="sumTune" style="color:var(--muted)">No</span></div>
+      </div>
+      <div class="total-box">
+        <div><div style="font-size:11px;color:var(--muted);font-family:var(--fm);letter-spacing:1px">TOTAL EST. COST</div><div style="font-size:11px;color:var(--subtle);margin-top:2px" id="sumPartsLabel">0 parts</div></div>
+        <div class="total-num" id="sumTotal">$0</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- Category tabs -->
+    <div>
+      <div class="sb-label" style="margin-bottom:10px">Browse by Category</div>
+      <div class="cat-tabs">
+        <div class="cat-tab active" onclick="filterCat(this,'all')">All <span class="cat-count" id="cnt-all">24</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'engine')">⚙️ Engine <span class="cat-count" id="cnt-engine">6</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'exhaust')">💨 Exhaust <span class="cat-count" id="cnt-exhaust">4</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'suspension')">🌊 Suspension <span class="cat-count" id="cnt-suspension">4</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'brakes')">🛑 Brakes <span class="cat-count" id="cnt-brakes">3</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'aero')">🏎️ Aero <span class="cat-count" id="cnt-aero">4</span></div>
+        <div class="cat-tab" onclick="filterCat(this,'wheels')">🛞 Wheels <span class="cat-count" id="cnt-wheels">3</span></div>
+      </div>
+    </div>
+
+    <!-- Parts header -->
+    <div class="parts-header">
+      <div>
+        <div class="parts-title" id="partsTitle">All Parts</div>
+        <div style="font-size:13px;color:var(--muted)" id="partsSubtitle">Showing all 24 compatible parts for your build</div>
+      </div>
+      <div class="parts-filter-row">
+        <select class="filter-sel" onchange="sortParts(this.value)">
+          <option value="popular">Most Popular</option>
+          <option value="hp">HP Gain ↑</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+          <option value="easy">Easiest Install</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Conflict warning (hidden by default) -->
+    <div class="conflict-bar" id="conflictBar" style="display:none">
+      <span class="icon">⚠️</span>
+      <div><strong>Tune Required:</strong> You've added a catless downpipe. A Stage 2 ECU tune is strongly recommended to avoid lean conditions. <span style="color:var(--blue);cursor:pointer;text-decoration:underline" onclick="filterCat(document.querySelector('.cat-tab'),'engine')">Add a tune →</span></div>
+    </div>
+
+    <!-- Parts grid -->
+    <div class="parts-grid" id="partsGrid"></div>
+  </main>
+</div>
+
+<!-- FLOATING BUILD BUTTON -->
+<button class="float-btn" onclick="toggleTray()">
+  🔧 My Build <span class="float-count" id="floatCount">0 parts</span>
+</button>
+
+<!-- BUILD TRAY -->
+<div class="build-tray" id="buildTray">
+  <div class="tray-header">
+    <div class="tray-title">My Build</div>
+    <button class="tray-close" onclick="toggleTray()">✕</button>
+  </div>
+  <div class="tray-items" id="trayItems">
+    <div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-text">No parts yet</div><div class="empty-sub">Browse and add mods to your build</div></div>
+  </div>
+  <div class="tray-total">
+    <div class="tray-total-row">
+      <div class="tray-total-label">Est. Total Cost</div>
+      <div class="tray-total-val" id="trayTotal">$0</div>
+    </div>
+    <button class="tray-cta">Share This Build →</button>
+  </div>
+</div>
+
+<script>
+// ── CAR DATABASE ──
+const carDB = {
+  Toyota:{models:{
+    'GR Supra':['3.0 Base','A91 Edition','45th Anniversary'],
+    'GR86':['Base','Premium'],
+    'Corolla GR':['Core','Circuit Edition']
+  },specs:{engine:'3.0L B58 Turbo',drive:'RWD',hp:'382 hp',torque:'368 lb-ft'}},
+  Honda:{models:{
+    'Civic Type R':['Base'],
+    'Civic Si':['Sedan'],
+    'Accord':['Sport','Touring']
+  },specs:{engine:'2.0L K20C1 Turbo',drive:'FWD',hp:'315 hp',torque:'310 lb-ft'}},
+  Subaru:{models:{
+    'WRX':['Base','Premium','Limited'],
+    'WRX STI':['Base','Limited','S209'],
+    'BRZ':['Premium','Limited']
+  },specs:{engine:'2.5L EJ257 Turbo',drive:'AWD',hp:'310 hp',torque:'290 lb-ft'}},
+  Mitsubishi:{models:{
+    'Lancer Evo X':['GSR','MR'],
+    'Lancer Evo IX':['GSR','MR','RS']
+  },specs:{engine:'2.0L 4B11T Turbo',drive:'AWD',hp:'291 hp',torque:'300 lb-ft'}},
+  Nissan:{models:{
+    'GT-R':['Premium','Track Edition','NISMO'],
+    '370Z':['Base','Sport','NISMO'],
+    'Silvia S15':['Spec R','Spec S']
+  },specs:{engine:'3.8L VR38DETT Twin-Turbo',drive:'AWD',hp:'565 hp',torque:'467 lb-ft'}},
+  Ford:{models:{
+    'Mustang GT':['Fastback','California Special'],
+    'Mustang GT500':['Base','Carbon Fiber Track Pack'],
+    'Focus RS':['Base']
+  },specs:{engine:'5.0L Coyote V8',drive:'RWD',hp:'450 hp',torque:'410 lb-ft'}},
+  Chevrolet:{models:{
+    'Camaro SS':['1LE','Base'],
+    'Corvette C8':['Stingray','Z06'],
+    'Camaro ZL1':['Base','1LE']
+  },specs:{engine:'6.2L LT1 V8',drive:'RWD',hp:'455 hp',torque:'455 lb-ft'}},
+  Dodge:{models:{
+    'Challenger SRT':['392','Hellcat','Demon 170'],
+    'Charger Hellcat':['Base','Redeye']
+  },specs:{engine:'6.4L 392 HEMI V8',drive:'RWD',hp:'485 hp',torque:'475 lb-ft'}},
+  BMW:{models:{
+    'M3':['Competition','xDrive'],
+    'M4':['Competition','M4 CSL'],
+    'M2':['Base','Competition']
+  },specs:{engine:'3.0L S58 Twin-Turbo',drive:'RWD',hp:'503 hp',torque:'479 lb-ft'}},
+  Volkswagen:{models:{
+    'Golf R':['Base'],
+    'Golf GTI':['S','SE','Autobahn']
+  },specs:{engine:'2.0L EA888 Turbo',drive:'4Motion AWD',hp:'315 hp',torque:'310 lb-ft'}},
+  Mazda:{models:{
+    'MX-5 Miata':['Sport','Club','Grand Touring'],
+    'RX-7 FD':['Base','R2','Touring']
+  },specs:{engine:'2.0L SkyActiv-G',drive:'RWD',hp:'181 hp',torque:'151 lb-ft'}},
+  Acura:{models:{
+    'Integra Type S':['Base'],
+    'NSX':['Base','Type S']
+  },specs:{engine:'2.0L K20C1 Turbo',drive:'FWD',hp:'320 hp',torque:'310 lb-ft'}}
+};
+
+// ── PARTS DATABASE ──
+const partsDB = [
+  {id:1,name:'Cold Air Intake',brand:'AEM / Eventuri',cat:'engine',icon:'🌬️',hp:'+8-12 whp',diff:'Easy',diffColor:'green',price:260,tune:'Not required',compat:'ok',popular:95,desc:'Direct-fit B58 intake. Gains 8–12whp. 2–3 hr DIY.',compatText:'✓ COMPATIBLE'},
+  {id:2,name:'Stage 2 ECU Tune',brand:'BM3 / Wedge',cat:'engine',icon:'💻',hp:'+45-65 whp',diff:'Software only',diffColor:'blue',price:600,tune:'IS the tune',compat:'ok',popular:92,desc:'Unlocks full combo gains. E30/E50 maps available.',compatText:'✓ COMPATIBLE'},
+  {id:3,name:'Downpipe (Catless)',brand:'VRSF / Eventuri',cat:'exhaust',icon:'⬇️',hp:'+20-28 whp',diff:'Moderate',diffColor:'amber',price:420,tune:'Strongly recommended',compat:'warn',popular:88,desc:'Gains 20–28whp. Tune strongly recommended.',compatText:'⚠ TUNE RECOMMENDED'},
+  {id:4,name:'Catback Exhaust',brand:'Akrapovič / Remus',cat:'exhaust',icon:'💨',hp:'+12-18 whp',diff:'Easy',diffColor:'green',price:1100,tune:'Not required',compat:'ok',popular:90,desc:'Significant sound increase. Valved options available.',compatText:'✓ COMPATIBLE'},
+  {id:5,name:'Intercooler Upgrade',brand:'Wagner / Mishimoto',cat:'engine',icon:'❄️',hp:'+8-15 whp',diff:'Moderate',diffColor:'amber',price:650,tune:'Not required',compat:'ok',popular:82,desc:'Required before turbo upgrade. Kills heat soak.',compatText:'✓ COMPATIBLE'},
+  {id:6,name:'Turbo Upgrade (B58)',brand:'Pure / Vargas',cat:'engine',icon:'🌀',hp:'+120-180 whp',diff:'Hard',diffColor:'red',price:3200,tune:'Required',compat:'req',popular:75,desc:'Stage 2+ platform turbo. Full supporting mods needed.',compatText:'REQUIRES SUPPORTING MODS'},
+  {id:7,name:'Coilover Kit',brand:'BC Racing / KW V3',cat:'suspension',icon:'🔩',hp:'N/A',diff:'Moderate',diffColor:'amber',price:1400,tune:'Alignment required',compat:'ok',popular:89,desc:'Full height + damper adjustability. Alignment after install.',compatText:'✓ COMPATIBLE'},
+  {id:8,name:'Sway Bar Set',brand:'Eibach / Whiteline',cat:'suspension',icon:'↔️',hp:'N/A',diff:'Easy',diffColor:'green',price:380,tune:'Not required',compat:'ok',popular:70,desc:'Front + rear. Significantly reduces body roll.',compatText:'✓ COMPATIBLE'},
+  {id:9,name:'Big Brake Kit',brand:'StopTech / Brembo',cat:'brakes',icon:'🛑',hp:'N/A',diff:'Moderate',diffColor:'amber',price:2200,tune:'Not required',compat:'ok',popular:72,desc:'6-piston front BBK. Check wheel clearance before ordering.',compatText:'⚠ CHECK WHEEL CLEARANCE'},
+  {id:10,name:'Brake Pads (Performance)',brand:'Hawk / EBC',cat:'brakes',icon:'🔴',hp:'N/A',diff:'Easy',diffColor:'green',price:120,tune:'Not required',compat:'ok',popular:85,desc:'HPS or DTC-60. Dramatically improved bite and fade resistance.',compatText:'✓ COMPATIBLE'},
+  {id:11,name:'Front Lip / Splitter',brand:'Rocketbunny / SEIBON',cat:'aero',icon:'🏎️',hp:'N/A',diff:'Easy',diffColor:'green',price:480,tune:'Not required',compat:'ok',popular:78,desc:'Adds downforce and changes the front end stance.',compatText:'✓ COMPATIBLE'},
+  {id:12,name:'Rear Wing (Swan Neck)',brand:'APR / Voltex',cat:'aero',icon:'🦢',hp:'N/A',diff:'Easy',diffColor:'green',price:680,tune:'Not required',compat:'ok',popular:74,desc:'High-downforce adjustable swan neck mount.',compatText:'✓ COMPATIBLE'},
+  {id:13,name:'Widebody Kit',brand:'Rocket Bunny / Liberty Walk',cat:'aero',icon:'💪',hp:'N/A',diff:'Hard',diffColor:'red',price:4200,tune:'Not required',compat:'warn',popular:65,desc:'Full fender flare kit. Requires wider wheels + alignment.',compatText:'⚠ VERIFY FITMENT'},
+  {id:14,name:'Forged Wheels (18")',brand:'Volk TE37 / HRE',cat:'wheels',icon:'⭕',hp:'N/A',diff:'Easy',diffColor:'green',price:2800,tune:'Not required',compat:'ok',popular:88,desc:'Full forged for weight savings. Check offset for your fenders.',compatText:'✓ COMPATIBLE'},
+  {id:15,name:'Sticky Track Tires',brand:'Michelin PS4S / AD08R',cat:'wheels',icon:'🏁',hp:'N/A',diff:'Easy',diffColor:'green',price:900,tune:'Not required',compat:'ok',popular:86,desc:'Massive grip improvement. Check treadwear for track use.',compatText:'✓ COMPATIBLE'},
+  {id:16,name:'Clutch Upgrade',brand:'ACT / Exedy',cat:'engine',icon:'⚙️',hp:'N/A',diff:'Hard',diffColor:'red',price:780,tune:'Not required',compat:'ok',popular:68,desc:'Required at 450whp+. Stage 2 or Stage 3 puck options.',compatText:'✓ COMPATIBLE'},
+  {id:17,name:'Short Shifter Kit',brand:'Raceseng / Mishimoto',cat:'engine',icon:'🎮',hp:'N/A',diff:'Easy',diffColor:'green',price:220,tune:'Not required',compat:'ok',popular:72,desc:'Reduces throw by 30–40%. Noticeably tighter feel.',compatText:'✓ COMPATIBLE'},
+  {id:18,name:'Flex Fuel Kit',brand:'EcuTek / BM3',cat:'engine',icon:'⛽',hp:'+20-30 whp',diff:'Moderate',diffColor:'amber',price:450,tune:'Required',compat:'req',popular:77,desc:'Run E30–E50 blends. Major gains when paired with tune.',compatText:'REQUIRES TUNE'},
+  {id:19,name:'Intake Manifold',brand:'MMP / Vargas',cat:'engine',icon:'📥',hp:'+10-20 whp',diff:'Moderate',diffColor:'amber',price:680,tune:'Recommended',compat:'ok',popular:65,desc:'Port-matched. Pair with LPFP for best results.',compatText:'✓ COMPATIBLE'},
+  {id:20,name:'LPFP Upgrade',brand:'JB4 / BM3',cat:'engine',icon:'💧',hp:'Required for 450whp+',diff:'Easy',diffColor:'green',price:280,tune:'Not required',compat:'ok',popular:80,desc:'Low pressure fuel pump upgrade. Required above 450whp.',compatText:'✓ COMPATIBLE'},
+  {id:21,name:'Exhaust Tips',brand:'Remus / Akrapovič',cat:'exhaust',icon:'🔈',hp:'N/A',diff:'Easy',diffColor:'green',price:180,tune:'Not required',compat:'ok',popular:60,desc:'Stainless quad or dual tips. Purely cosmetic.',compatText:'✓ COMPATIBLE'},
+  {id:22,name:'Cat Delete Pipe',brand:'VRSF / BimmerWorld',cat:'exhaust',icon:'🚫',hp:'+5-10 whp',diff:'Easy',diffColor:'green',price:160,tune:'Not required',compat:'warn',popular:58,desc:'Off-road use only. Will throw a code without a tune.',compatText:'⚠ OFF-ROAD ONLY'},
+  {id:23,name:'Strut Tower Brace',brand:'Eibach / Cusco',cat:'suspension',icon:'🏗️',hp:'N/A',diff:'Easy',diffColor:'green',price:240,tune:'Not required',compat:'ok',popular:65,desc:'Reduces chassis flex. Improves steering response.',compatText:'✓ COMPATIBLE'},
+  {id:24,name:'Camber/Toe Arms',brand:'Megan Racing / Whiteline',cat:'suspension',icon:'📐',hp:'N/A',diff:'Moderate',diffColor:'amber',price:320,tune:'Alignment required',compat:'ok',popular:62,desc:'Full adjustability. Required for aggressive wheel fitment.',compatText:'✓ COMPATIBLE'},
+];
+
+let selectedCar = { year:'2021', make:'Toyota', model:'GR Supra', trim:'3.0 Base' };
+let addedParts = [];
+let currentCat = 'all';
+let currentSort = 'popular';
+
+// ── MODEL DROPDOWN ──
+function updateModel() {
+  const make = document.getElementById('selMake').value;
+  const modelSel = document.getElementById('selModel');
+  const trimSel = document.getElementById('selTrim');
+  modelSel.innerHTML = '<option value="">Model</option>';
+  trimSel.innerHTML = '<option value="">Trim (optional)</option>';
+  if (make && carDB[make]) {
+    Object.keys(carDB[make].models).forEach(m => {
+      modelSel.innerHTML += `<option>${m}</option>`;
+    });
+  }
+  updateCar();
+}
+
+function updateCar() {
+  const year = document.getElementById('selYear').value;
+  const make = document.getElementById('selMake').value;
+  const model = document.getElementById('selModel').value;
+  const trim = document.getElementById('selTrim').value;
+
+  // Update trim options
+  if (make && model && carDB[make]?.models[model]) {
+    const trimSel = document.getElementById('selTrim');
+    trimSel.innerHTML = '<option value="">Trim (optional)</option>';
+    carDB[make].models[model].forEach(t => {
+      trimSel.innerHTML += `<option>${t}</option>`;
+    });
+  }
+
+  if (year && make && model) {
+    selectedCar = { year, make, model, trim };
+    const specs = carDB[make]?.specs || {};
+    document.getElementById('carCardMake').textContent = `${year} ${model}`;
+    document.getElementById('carCardSub').textContent = `${specs.engine || ''} · ${specs.drive || ''} · ${specs.hp || ''}`;
+    document.getElementById('carCard').classList.add('show');
+    const tags = document.getElementById('carCardTags');
+    tags.innerHTML = [specs.engine, specs.drive, specs.hp, specs.torque].filter(Boolean).map(t=>`<span class="car-tag">${t}</span>`).join('');
+    document.getElementById('s1dot').textContent = '✓';
+    document.getElementById('s1dot').className = 'step-dot done';
+    document.getElementById('s1sub').textContent = `${year} ${make} ${model}`;
+    document.getElementById('partsSubtitle').textContent = `Showing compatible parts for your ${year} ${make} ${model}`;
+    renderParts();
+  }
+}
+
+// ── RENDER PARTS ──
+function renderParts() {
+  let parts = [...partsDB];
+  if (currentCat !== 'all') parts = parts.filter(p => p.cat === currentCat);
+
+  if (currentSort === 'popular') parts.sort((a,b) => b.popular - a.popular);
+  else if (currentSort === 'hp') parts.sort((a,b) => parseInt(b.hp) - parseInt(a.hp));
+  else if (currentSort === 'price-asc') parts.sort((a,b) => a.price - b.price);
+  else if (currentSort === 'price-desc') parts.sort((a,b) => b.price - a.price);
+  else if (currentSort === 'easy') parts.sort((a,b) => (a.diff==='Easy'?0:a.diff==='Moderate'?1:2) - (b.diff==='Easy'?0:b.diff==='Moderate'?1:2));
+
+  const isAdded = id => addedParts.find(p => p.id === id);
+  const catName = currentCat === 'all' ? 'All Parts' : currentCat.charAt(0).toUpperCase() + currentCat.slice(1);
+  document.getElementById('partsTitle').textContent = catName;
+  document.getElementById('partsSubtitle').textContent = `${parts.length} parts · ${selectedCar.year} ${selectedCar.make} ${selectedCar.model}`;
+
+  document.getElementById('partsGrid').innerHTML = parts.map(p => `
+    <div class="part-card ${isAdded(p.id)?'added':''}" id="pc-${p.id}" onclick="togglePart(${p.id})">
+      <div class="pc-top">
+        <span class="pc-icon">${p.icon}</span>
+        <span class="pc-badge ${p.compat==='ok'?'compat-ok':p.compat==='warn'?'compat-warn':p.compat==='req'?'compat-req':'compat-no'}">${p.compatText}</span>
+      </div>
+      <div class="pc-name">${p.name}</div>
+      <div class="pc-brand">${p.brand}</div>
+      <div class="pc-stats">
+        <div class="pc-stat"><div class="pc-stat-label">HP Gain</div><div class="pc-stat-val ${p.hp.startsWith('+')?'amber':'muted'}">${p.hp}</div></div>
+        <div class="pc-stat"><div class="pc-stat-label">Difficulty</div><div class="pc-stat-val ${p.diffColor}">${p.diff}</div></div>
+        <div class="pc-stat"><div class="pc-stat-label">Tune</div><div class="pc-stat-val" style="font-size:11px;color:${p.tune.includes('required')||p.tune.includes('Required')||p.tune==='Required'?'var(--amber)':'var(--green)'}">${p.tune}</div></div>
+        <div class="pc-stat"><div class="pc-stat-label">Est. Price</div><div class="pc-stat-val blue">$${p.price.toLocaleString()}</div></div>
+      </div>
+      <div class="pc-footer">
+        <div class="pc-price">$${p.price.toLocaleString()}</div>
+        <button class="add-btn ${isAdded(p.id)?'added':''}" onclick="event.stopPropagation();togglePart(${p.id})">${isAdded(p.id)?'✓ Added':'+ Add'}</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── TOGGLE PART ──
+function togglePart(id) {
+  const part = partsDB.find(p => p.id === id);
+  if (!part) return;
+  const idx = addedParts.findIndex(p => p.id === id);
+  if (idx > -1) {
+    addedParts.splice(idx, 1);
+  } else {
+    addedParts.push(part);
+  }
+  updateSummary();
+  renderParts();
+  renderTray();
+  checkConflicts();
+}
+
+function updateSummary() {
+  const total = addedParts.reduce((s,p) => s+p.price, 0);
+  const hpGains = addedParts.filter(p=>p.hp.startsWith('+')).map(p=>parseInt(p.hp.match(/\d+/)?.[0]||0));
+  const totalHp = hpGains.reduce((s,n)=>s+n,0);
+  const needsTune = addedParts.some(p=>p.tune==='Strongly recommended'||p.tune==='Required');
+  const issues = addedParts.filter(p=>p.compat==='warn'||p.compat==='req').length;
+
+  document.getElementById('sumParts').textContent = addedParts.length;
+  document.getElementById('sumHp').textContent = `+${totalHp} whp est.`;
+  document.getElementById('sumCompat').textContent = issues > 0 ? `${issues} item${issues>1?'s':''} to check` : 'All Good ✓';
+  document.getElementById('sumCompat').style.color = issues > 0 ? 'var(--amber)' : 'var(--green)';
+  document.getElementById('sumTune').textContent = needsTune ? 'Yes ⚠' : 'No';
+  document.getElementById('sumTune').style.color = needsTune ? 'var(--amber)' : 'var(--green)';
+  document.getElementById('sumTotal').textContent = '$' + total.toLocaleString();
+  document.getElementById('sumPartsLabel').textContent = `${addedParts.length} part${addedParts.length!==1?'s':''}`;
+  document.getElementById('summarySection').style.display = addedParts.length > 0 ? '' : 'none';
+
+  // Update nav/float count
+  document.getElementById('navCount').textContent = addedParts.length;
+  document.getElementById('floatCount').textContent = `${addedParts.length} part${addedParts.length!==1?'s':''}`;
+
+  // Step advancement
+  if (addedParts.length > 0) {
+    document.getElementById('s2dot').className = 'step-dot done';
+    document.getElementById('s2dot').textContent = '✓';
+    document.getElementById('s3dot').className = 'step-dot active';
+  } else {
+    document.getElementById('s2dot').className = 'step-dot active';
+    document.getElementById('s2dot').textContent = '2';
+    document.getElementById('s3dot').className = 'step-dot idle';
+  }
+}
+
+function renderTray() {
+  const items = document.getElementById('trayItems');
+  const total = addedParts.reduce((s,p)=>s+p.price,0);
+  document.getElementById('trayTotal').textContent = '$' + total.toLocaleString();
+
+  if (addedParts.length === 0) {
+    items.innerHTML = '<div class="empty-state"><div class="empty-icon">🔧</div><div class="empty-text">No parts yet</div><div class="empty-sub">Browse and add mods to your build</div></div>';
+    return;
+  }
+  items.innerHTML = addedParts.map(p => `
+    <div class="tray-item">
+      <span style="font-size:16px">${p.icon}</span>
+      <div class="ti-name">${p.name}<div class="ti-price">$${p.price.toLocaleString()}</div></div>
+      <button class="ti-remove" onclick="togglePart(${p.id})">✕</button>
+    </div>
+  `).join('');
+}
+
+function checkConflicts() {
+  const hasDP = addedParts.some(p => p.name.includes('Downpipe'));
+  const hasTune = addedParts.some(p => p.cat==='engine' && p.name.includes('Tune'));
+  document.getElementById('conflictBar').style.display = (hasDP && !hasTune) ? 'flex' : 'none';
+}
+
+function filterCat(el, cat) {
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  currentCat = cat;
+  renderParts();
+}
+
+function sortParts(val) { currentSort = val; renderParts(); }
+
+function toggleTray() {
+  document.getElementById('buildTray').classList.toggle('open');
+}
+
+// ── INIT ──
+document.getElementById('selYear').value = '2021';
+document.getElementById('selMake').value = 'Toyota';
+updateModel();
+setTimeout(() => {
+  document.getElementById('selModel').value = 'GR Supra';
+  updateCar();
+}, 50);
+renderParts();
+</script>
+</body>
+</html>
