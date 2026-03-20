@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CarBuilding101 — My Build</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#5BAAF0;--blue-dark:#2e86d4;--blue-glow:rgba(91,170,240,0.11);
+  --black:#08090b;--dark:#0d0e14;--surface:#13151d;--s2:#191c28;--s3:#1e2232;
+  --border:rgba(255,255,255,0.08);--b2:rgba(91,170,240,0.22);--b3:rgba(255,255,255,0.13);
+  --text:#eeedf2;--muted:#7e7d8e;--subtle:#1e2030;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a855f7;
+  --ff:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:var(--fb);font-size:15px;line-height:1.6;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--subtle);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:58px;background:rgba(8,9,11,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.logo{font-family:var(--ff);font-size:20px;letter-spacing:2px;color:var(--text);text-decoration:none}.logo span{color:var(--blue)}
+.nav-links{display:flex;align-items:center;gap:20px;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:8px}
+.btn-xs{padding:7px 16px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:var(--fb);transition:all .2s;display:inline-flex;align-items:center;gap:5px}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.btn-ghost:hover{border-color:var(--b2);color:var(--blue)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue-dark)}
+
+/* PAGE */
+.page{margin-top:58px;max-width:1200px;margin-left:auto;margin-right:auto;padding:28px 28px 80px}
+
+/* BUILD HEADER */
+.build-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px;flex-wrap:wrap}
+.bh-left{}
+.bh-over{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:6px}
+.bh-title{font-family:var(--ff);font-size:clamp(32px,5vw,52px);letter-spacing:2px;line-height:1;margin-bottom:6px}
+.bh-car{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px}
+.bh-car-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0}
+.bh-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* COMPATIBILITY BAR */
+.compat-bar{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.compat-bar.has-warn{border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.05)}
+.compat-bar.all-good{border-color:rgba(34,197,94,.2);background:rgba(34,197,94,.04)}
+.cb-icon{font-size:18px;flex-shrink:0}
+.cb-text{flex:1;font-size:13px}
+.cb-text strong{color:var(--text)}
+.cb-warnings{display:flex;flex-direction:column;gap:5px;width:100%;padding-top:8px;border-top:1px solid var(--border);margin-top:4px}
+.cw-item{display:flex;align-items:flex-start;gap:8px;font-size:12px;padding:6px 10px;border-radius:6px}
+.cw-item.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--amber)}
+.cw-item.error{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+.cw-item.info{background:rgba(91,170,240,.08);border:1px solid rgba(91,170,240,.2);color:var(--blue)}
+.cw-fix{margin-left:auto;font-size:11px;font-weight:600;cursor:pointer;text-decoration:underline;opacity:.8;white-space:nowrap}
+
+/* MAIN LAYOUT */
+.layout{display:grid;grid-template-columns:1fr 320px;gap:20px;align-items:start}
+
+/* PARTS TABLE */
+.parts-table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.pt-head{display:grid;grid-template-columns:140px 1fr 90px 90px 90px 110px 44px;gap:0;padding:10px 14px;background:var(--s2);border-bottom:1px solid var(--border)}
+.pth{font-size:10px;font-family:var(--fm);letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:0 6px}
+.pth.right{text-align:right}
+.pth.center{text-align:center}
+
+.pt-empty{padding:48px;text-align:center;color:var(--muted)}
+.pt-empty-icon{font-size:36px;opacity:.25;margin-bottom:12px}
+.pt-empty-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px}
+
+/* CATEGORY GROUP */
+.cat-group{}
+.cat-label{display:flex;align-items:center;gap:8px;padding:10px 20px 6px;background:var(--dark);border-bottom:1px solid var(--border);font-size:10px;font-family:var(--fm);letter-spacing:2px;text-transform:uppercase;color:var(--muted);position:sticky;top:58px;z-index:10}
+.cat-label-icon{font-size:13px}
+.cat-add-btn{margin-left:auto;font-size:10px;color:var(--blue);cursor:pointer;font-family:var(--fb);font-weight:600;background:none;border:1px solid var(--b2);padding:3px 10px;border-radius:4px;transition:all .2s}
+.cat-add-btn:hover{background:var(--blue-glow)}
+
+/* PART ROW */
+.part-row{display:grid;grid-template-columns:140px 1fr 90px 90px 90px 110px 44px;gap:0;padding:0;border-bottom:1px solid var(--border);transition:background .15s;align-items:stretch}
+.part-row:last-child{border-bottom:none}
+.part-row:hover{background:var(--s2)}
+
+.pr-cell{padding:12px 8px 12px 14px;display:flex;align-items:center;min-width:0}
+.pr-cell.right{justify-content:flex-end;padding-right:14px}
+.pr-cell.center{justify-content:center}
+
+.pr-cat{font-size:11px;font-family:var(--fm);color:var(--muted);letter-spacing:.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.pr-part{display:flex;flex-direction:column;gap:2px;min-width:0}
+.pr-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pr-brand{font-size:11px;color:var(--muted)}
+.pr-warn{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--fm);padding:2px 7px;border-radius:3px;margin-top:3px;width:fit-content}
+.pr-warn.warn{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+.pr-warn.ok{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--green)}
+.pr-warn.req{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:var(--red)}
+
+/* Price cells */
+.pr-retailer{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.pr-price{font-family:var(--fm);font-size:12px;font-weight:500}
+.pr-price.best{color:var(--green)}
+.pr-price.muted{color:var(--muted)}
+.pr-price.unavail{color:var(--subtle);font-size:11px}
+.pr-buy{font-size:10px;color:var(--blue);text-decoration:none;opacity:.7;transition:opacity .2s}
+.pr-buy:hover{opacity:1}
+.pr-retailer-logo{font-size:9px;font-family:var(--fm);letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
+
+/* Best price cell */
+.pr-best{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.pr-best-price{font-family:var(--ff);font-size:18px;letter-spacing:.5px;color:var(--blue)}
+.pr-best-store{font-size:10px;font-family:var(--fm);color:var(--muted)}
+
+/* Sparkline */
+.pr-spark{display:flex;align-items:center;justify-content:center}
+.spark-wrap{position:relative;cursor:pointer}
+.spark-wrap:hover .spark-tooltip{opacity:1;pointer-events:all}
+.spark-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(10,12,20,.97);border:1px solid var(--b2);border-radius:7px;padding:10px 12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s;z-index:50;min-width:160px}
+.st-title{font-size:10px;font-family:var(--fm);letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.st-row{display:flex;justify-content:space-between;gap:16px;font-size:11px;margin-bottom:2px}
+.st-k{color:var(--muted)}.st-v{font-family:var(--fm);font-weight:500}
+.st-low{color:var(--green)}.st-high{color:var(--red)}.st-now{color:var(--blue)}
+
+/* Remove button */
+.pr-remove{background:none;border:none;color:var(--subtle);cursor:pointer;font-size:15px;transition:color .2s;padding:0 8px;display:flex;align-items:center;justify-content:center;width:100%;height:100%}
+.pr-remove:hover{color:var(--red)}
+
+/* ADD ROW */
+.add-row{display:flex;align-items:center;gap:10px;padding:10px 20px;border-bottom:1px solid var(--border);background:transparent;transition:background .15s;cursor:pointer}
+.add-row:hover{background:var(--s2)}
+.add-row-icon{width:28px;height:28px;border-radius:50%;background:var(--s2);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);flex-shrink:0;transition:all .2s}
+.add-row:hover .add-row-icon{border-color:var(--b2);color:var(--blue);background:var(--blue-glow)}
+.add-row-text{font-size:12px;color:var(--muted)}
+
+/* RIGHT PANEL */
+.right-panel{display:flex;flex-direction:column;gap:14px;position:sticky;top:76px}
+
+/* TOTAL CARD */
+.total-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.tc-head{padding:14px 18px;border-bottom:1px solid var(--border)}
+.tc-label{font-size:10px;font-family:var(--fm);letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.tc-total{font-family:var(--ff);font-size:42px;letter-spacing:2px;color:var(--blue);line-height:1}
+.tc-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.tc-rows{padding:12px 18px;display:flex;flex-direction:column;gap:0;border-bottom:1px solid var(--border)}
+.tc-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.tc-row:last-child{border-bottom:none}
+.tc-k{color:var(--muted)}.tc-v{font-weight:600;font-family:var(--fm);font-size:11px}
+.tc-actions{padding:14px 18px;display:flex;flex-direction:column;gap:7px}
+.tc-btn{width:100%;padding:11px;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:all .2s;border:none;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.tc-btn.blue{background:var(--blue);color:#fff}.tc-btn.blue:hover{background:var(--blue-dark)}
+.tc-btn.ghost{background:transparent;color:var(--text);border:1px solid var(--b3)}.tc-btn.ghost:hover{border-color:var(--b2)}
+
+/* BUILD STATS */
+.stats-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.sc-title{font-size:10px;font-family:var(--fm);letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sc-stat{background:var(--s2);border-radius:7px;padding:10px 12px}
+.sc-val{font-family:var(--ff);font-size:22px;letter-spacing:.5px;line-height:1;margin-bottom:2px}
+.sc-val.blue{color:var(--blue)}.sc-val.green{color:var(--green)}.sc-val.amber{color:var(--amber)}.sc-val.red{color:var(--red)}
+.sc-label{font-size:10px;color:var(--muted);font-family:var(--fm);letter-spacing:.5px;text-transform:uppercase}
+
+/* HP BAR */
+.hp-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.hpc-title{font-size:10px;font-family:var(--fm);letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+.hp-bar-wrap{margin-bottom:14px}
+.hp-bar-labels{display:flex;justify-content:space-between;font-size:11px;font-family:var(--fm);color:var(--muted);margin-bottom:5px}
+.hp-bar-labels span:last-child{color:var(--blue)}
+.hp-track{height:8px;background:var(--subtle);border-radius:4px;overflow:hidden;position:relative}
+.hp-fill{height:100%;background:linear-gradient(90deg,var(--blue),#7dcfff);border-radius:4px;transition:width .6s ease}
+.hp-stages{display:flex;flex-direction:column;gap:5px}
+.hp-stage-row{display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.hs-label{color:var(--muted)}
+.hs-val{font-family:var(--fm);font-weight:500;color:var(--blue)}
+
+/* PRICE CHART CARD */
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.cc-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cc-title{font-size:10px;font-family:var(--fm);letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.cc-tabs{display:flex;gap:4px}
+.cc-tab{font-size:10px;font-family:var(--fm);padding:3px 8px;border-radius:3px;cursor:pointer;border:1px solid var(--border);color:var(--muted);background:transparent;transition:all .2s}
+.cc-tab.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.chart-canvas-wrap{position:relative}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:400;opacity:0;pointer-events:none;transition:opacity .25s;display:flex;align-items:center;justify-content:center}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--dark);border:1px solid var(--b2);border-radius:14px;width:min(520px,94vw);max-height:85vh;overflow-y:auto;padding:24px;position:relative;transform:scale(.96);transition:transform .25s}
+.modal-overlay.show .modal{transform:scale(1)}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;transition:color .2s}
+.modal-close:hover{color:var(--text)}
+.modal-title{font-family:var(--ff);font-size:26px;letter-spacing:1px;margin-bottom:4px}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:18px}
+.modal-search{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:10px 12px;color:var(--text);font-family:var(--fb);font-size:14px;outline:none;margin-bottom:12px;transition:border-color .2s}
+.modal-search:focus{border-color:var(--blue)}
+.modal-parts{display:flex;flex-direction:column;gap:5px;max-height:340px;overflow-y:auto}
+.mp{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .2s}
+.mp:hover{border-color:var(--b2);background:var(--s2)}
+.mp-icon{font-size:18px;width:32px;text-align:center;flex-shrink:0}
+.mp-info{flex:1;min-width:0}
+.mp-name{font-size:13px;font-weight:600}
+.mp-brand{font-size:11px;color:var(--muted)}
+.mp-price{font-family:var(--fm);font-size:12px;color:var(--blue);flex-shrink:0}
+.mp-add{background:var(--blue);color:#fff;border:none;padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--fb);transition:background .2s;flex-shrink:0}
+.mp-add:hover{background:var(--blue-dark)}
+.mp-add.done{background:var(--s3);color:var(--muted);cursor:default}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);z-index:500;background:rgba(19,21,29,.97);border:1px solid var(--b2);border-radius:8px;padding:10px 20px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:1024px){.layout{grid-template-columns:1fr}.right-panel{position:static}}
+@media(max-width:640px){.page{padding:16px 14px 60px}.pt-head{display:none}.part-row{grid-template-columns:1fr auto;gap:0}.pr-cat,.pr-spark,.pr-cell:nth-child(3),.pr-cell:nth-child(4),.pr-cell:nth-child(5){display:none}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">CAR<span>BUILDING</span>101</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="build-picker.html">Build Picker</a></li>
+    <li><a href="community.html">Community</a></li>
+    <li><a href="garage.html">Garage</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="build-picker.html" class="btn-xs btn-ghost">+ Add Parts</a>
+    <button class="btn-xs btn-blue" onclick="shareBuild()">📤 Share Build</button>
+  </div>
+</nav>
+
+<div class="page" style="margin-top:86px">
+
+  <!-- BUILD HEADER -->
+  <div class="build-header">
+    <div class="bh-left">
+      <div class="bh-over">My Build</div>
+      <div class="bh-title" id="buildTitle">UNNAMED BUILD</div>
+      <div class="bh-car">
+        <div class="bh-car-dot"></div>
+        <span id="buildCarLabel">No vehicle selected — <a href="build-picker.html" style="color:var(--blue)">go to Build Picker →</a></span>
+      </div>
+    </div>
+    <div class="bh-actions">
+      <button class="btn-xs btn-ghost" onclick="clearBuild()">🗑 Clear All</button>
+      <button class="btn-xs btn-ghost" onclick="exportBuild()">📋 Copy List</button>
+      <button class="btn-xs btn-blue" onclick="shareBuild()">📤 Share</button>
+    </div>
+  </div>
+
+  <!-- COMPATIBILITY BAR -->
+  <div class="compat-bar" id="compatBar">
+    <div class="cb-icon">✅</div>
+    <div class="cb-text"><strong>No compatibility issues.</strong> Add parts from the Build Picker to get started.</div>
+  </div>
+
+  <!-- LAYOUT -->
+  <div class="layout">
+
+    <!-- PARTS TABLE -->
+    <div>
+      <div class="parts-table-wrap" id="partsTable">
+        <div class="pt-head">
+          <div class="pth">Category</div>
+          <div class="pth">Part / Brand</div>
+          <div class="pth right">Amazon</div>
+          <div class="pth right">eBay</div>
+          <div class="pth right">RockAuto</div>
+          <div class="pth right">Best Price</div>
+          <div class="pth center">30d Chart</div>
+          <div class="pth"></div>
+        </div>
+        <div id="tableBody">
+          <!-- populated by JS -->
+          <div class="pt-empty" id="emptyState">
+            <div class="pt-empty-icon">🔧</div>
+            <div class="pt-empty-title">Your build list is empty</div>
+            <div style="font-size:13px;margin-bottom:18px">Head to the Build Picker to add parts for your vehicle</div>
+            <a href="build-picker.html" class="btn-xs btn-blue" style="display:inline-flex;margin:0 auto">Open Build Picker →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+
+      <!-- TOTAL -->
+      <div class="total-card">
+        <div class="tc-head">
+          <div class="tc-label">Estimated Total</div>
+          <div class="tc-total" id="totalPrice">$0</div>
+          <div class="tc-sub" id="totalSub">0 parts · No vehicle selected</div>
+        </div>
+        <div class="tc-rows" id="totalRows">
+          <div class="tc-row"><span class="tc-k">Parts</span><span class="tc-v" id="tcParts" style="color:var(--blue)">0</span></div>
+          <div class="tc-row"><span class="tc-k">Est. HP Gain</span><span class="tc-v" id="tcHp" style="color:var(--amber)">+0 whp</span></div>
+          <div class="tc-row"><span class="tc-k">Tune Required</span><span class="tc-v" id="tcTune" style="color:var(--muted)">—</span></div>
+          <div class="tc-row"><span class="tc-k">Compatibility</span><span class="tc-v" id="tcCompat" style="color:var(--green)">—</span></div>
+          <div class="tc-row"><span class="tc-k">Cheapest Option</span><span class="tc-v" id="tcCheapest" style="color:var(--green)">$0</span></div>
+        </div>
+        <div class="tc-actions">
+          <a href="build-picker.html" class="tc-btn blue">+ Add More Parts</a>
+          <button class="tc-btn ghost" onclick="shareBuild()">📤 Share This Build</button>
+          <button class="tc-btn ghost" onclick="exportBuild()">📋 Copy as Text</button>
+        </div>
+      </div>
+
+      <!-- BUILD STATS -->
+      <div class="stats-card">
+        <div class="sc-title">Build Stats</div>
+        <div class="sc-grid" id="statsGrid">
+          <div class="sc-stat"><div class="sc-val blue" id="st-hp">0</div><div class="sc-label">Est WHP</div></div>
+          <div class="sc-stat"><div class="sc-val green" id="st-parts">0</div><div class="sc-label">Mods</div></div>
+          <div class="sc-stat"><div class="sc-val amber" id="st-stage">—</div><div class="sc-label">Stage</div></div>
+          <div class="sc-stat"><div class="sc-val" id="st-diff" style="color:var(--muted)">—</div><div class="sc-label">Avg Diff.</div></div>
+        </div>
+      </div>
+
+      <!-- HP BAR -->
+      <div class="hp-card" id="hpCard">
+        <div class="hpc-title">Power Estimate</div>
+        <div class="hp-bar-wrap">
+          <div class="hp-bar-labels"><span id="hpStockLabel">Stock: — hp</span><span id="hpModLabel">Est: — whp</span></div>
+          <div class="hp-track"><div class="hp-fill" id="hpFill" style="width:0%"></div></div>
+        </div>
+        <div class="hp-stages" id="hpStages"></div>
+      </div>
+
+      <!-- 30-DAY PRICE CHART -->
+      <div class="chart-card">
+        <div class="cc-head">
+          <div class="cc-title">Total Build Cost — 30d</div>
+          <div class="cc-tabs">
+            <button class="cc-tab active" onclick="setChartRange(this,30)">30d</button>
+            <button class="cc-tab" onclick="setChartRange(this,60)">60d</button>
+            <button class="cc-tab" onclick="setChartRange(this,90)">90d</button>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="priceChart" width="284" height="100" style="width:100%;height:100px"></canvas>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--fm);color:var(--muted);margin-top:6px" id="chartLegend">
+          <span>30 days ago</span><span>Today</span>
+        </div>
+      </div>
+
+    </div><!-- end right panel -->
+  </div><!-- end layout -->
+</div>
+
+<!-- ADD PART MODAL -->
+<div class="modal-overlay" id="addModal" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('addModal').classList.remove('show')">✕</button>
+    <div class="modal-title" id="modalTitle">Add Part</div>
+    <div class="modal-sub" id="modalSub">Select a part to add to your build</div>
+    <input class="modal-search" id="modalSearch" type="text" placeholder="Search parts…" oninput="filterModalParts()">
+    <div class="modal-parts" id="modalParts"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="vehicles-db.js"></script>
+<script>
+
+// ═══════════════════════════════════════════════
+// STATE — load from sessionStorage if coming
+//         from build-picker, else demo data
+// ═══════════════════════════════════════════════
+
+const DEMO_BUILD = {
+  make: 'Toyota',
+  model: 'Tacoma',
+  year: 2019,
+  trim: 'TRD Off-Road (V6)',
+  parts: []
+};
+
+// Try to load saved build from sessionStorage
+function loadBuild() {
+  try {
+    const saved = sessionStorage.getItem('cb101_build');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return DEMO_BUILD;
+}
+
+function saveBuild(build) {
+  try { sessionStorage.setItem('cb101_build', JSON.stringify(build)); } catch(e) {}
+}
+
+let BUILD = loadBuild();
+
+// If no parts yet, pre-populate with first 4 parts for the demo vehicle
+if (!BUILD.parts || BUILD.parts.length === 0) {
+  const demoParts = getPartsForVehicle(BUILD.make, BUILD.model);
+  BUILD.parts = demoParts.slice(0, 4);
+  saveBuild(BUILD);
+}
+
+// ═══════════════════════════════════════════════
+// PRICE SIMULATION — realistic per-part 30/60/90d
+// ═══════════════════════════════════════════════
+function genPriceHistory(basePrice, days) {
+  const pts = [];
+  let cur = basePrice * (0.95 + Math.random() * 0.1);
+  for (let i = 0; i < days; i++) {
+    cur += (Math.random() - 0.49) * (basePrice * 0.018);
+    cur = Math.max(basePrice * 0.82, Math.min(basePrice * 1.18, cur));
+    pts.push(Math.round(cur));
+  }
+  pts[pts.length - 1] = basePrice; // today = actual price
+  return pts;
+}
+
+// Simulated retailer prices (Amazon slightly higher, eBay variable, RockAuto cheapest on maintenance)
+function getRetailerPrices(part) {
+  const base = part.price;
+  const cat = part.cat;
+  // RockAuto tends to be cheapest on brakes/suspension, Amazon fastest
+  const amMult  = 1.0 + (Math.random() * 0.08);
+  const ebMult  = 0.92 + (Math.random() * 0.12);
+  const raMult  = (cat === 'brakes' || cat === 'suspension') ? 0.85 + (Math.random() * 0.08) : 0.95 + (Math.random() * 0.06);
+  return {
+    amazon:   Math.round(base * amMult),
+    ebay:     Math.round(base * ebMult),
+    rockauto: Math.round(base * raMult),
+  };
+}
+
+// Cache prices so they don't flicker on re-render
+const priceCache = {};
+function getCachedPrices(part) {
+  if (!priceCache[part.id]) priceCache[part.id] = getRetailerPrices(part);
+  return priceCache[part.id];
+}
+
+// ═══════════════════════════════════════════════
+// COMPATIBILITY CHECKS
+// ═══════════════════════════════════════════════
+function runCompatChecks(parts) {
+  const warnings = [];
+  const hasDP    = parts.some(p => p.name.toLowerCase().includes('downpipe') || p.name.toLowerCase().includes('uppipe'));
+  const hasTune  = parts.some(p => p.name.toLowerCase().includes('tune') || p.name.toLowerCase().includes('accessport'));
+  const hasLift  = parts.some(p => p.name.toLowerCase().includes('lift kit') || p.name.toLowerCase().includes('suspension lift'));
+  const has35    = parts.some(p => p.name.includes('35"'));
+  const has33    = parts.some(p => p.name.includes('33"'));
+  const hasTurbo = parts.some(p => p.name.toLowerCase().includes('turbo') || p.name.toLowerCase().includes('supercharger'));
+  const hasIC    = parts.some(p => p.name.toLowerCase().includes('intercooler'));
+  const hasRear  = parts.some(p => p.name.toLowerCase().includes('rear wing') || p.name.toLowerCase().includes('widebody'));
+  const hasCoils = parts.some(p => p.name.toLowerCase().includes('coilover'));
+
+  if (hasDP && !hasTune)
+    warnings.push({ type:'warn', msg:'Downpipe / uppipe added without a tune — lean conditions possible. Add a tune.', fix:'Add Tune' });
+  if (hasTurbo && !hasIC)
+    warnings.push({ type:'warn', msg:'Turbo / supercharger upgrade added — intercooler upgrade strongly recommended.', fix:'Add FMIC' });
+  if (has35 && !hasLift)
+    warnings.push({ type:'error', msg:'35" tires require at least 4" lift kit for proper clearance.', fix:'Add Lift Kit' });
+  if (has33 && !hasLift)
+    warnings.push({ type:'info', msg:'33" tires recommended with 2"+ lift for best fitment. Works stock but may rub.', fix:'Add Lift Kit' });
+  if (hasTurbo && !hasTune)
+    warnings.push({ type:'warn', msg:'Turbo / SC upgrade requires a custom tune to run safely.', fix:'Add Tune' });
+  if (hasCoils)
+    warnings.push({ type:'info', msg:'Coilover install requires professional alignment after fitment.', fix:null });
+  return warnings;
+}
+
+// ═══════════════════════════════════════════════
+// SPARKLINE CANVAS
+// ═══════════════════════════════════════════════
+function drawSparkline(canvas, part, days) {
+  if (!canvas) return;
+  const history = genPriceHistory(part.price, days);
+  const W = canvas.width, H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const min = Math.min(...history);
+  const max = Math.max(...history);
+  const range = max - min || 1;
+
+  const pts = history.map((v, i) => ({
+    x: (i / (history.length - 1)) * W,
+    y: H - ((v - min) / range) * (H - 4) - 2
+  }));
+
+  // Gradient fill
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(91,170,240,0.25)');
+  grad.addColorStop(1, 'rgba(91,170,240,0)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#5BAAF0';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // End dot
+  const last = pts[pts.length - 1];
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = '#5BAAF0';
+  ctx.fill();
+
+  return { min, max, current: history[history.length-1] };
+}
+
+// ═══════════════════════════════════════════════
+// RENDER TABLE
+// ═══════════════════════════════════════════════
+const CAT_ORDER  = ['engine','exhaust','suspension','brakes','wheels','aero'];
+const CAT_LABELS = { engine:'⚙️ Engine', exhaust:'💨 Exhaust', suspension:'🌊 Suspension', brakes:'🛑 Brakes', wheels:'🛞 Wheels', aero:'🏎️ Aero' };
+
+function renderTable() {
+  const parts  = BUILD.parts || [];
+  const body   = document.getElementById('tableBody');
+  const empty  = document.getElementById('emptyState');
+
+  if (parts.length === 0) {
+    body.innerHTML = '';
+    body.appendChild(empty);
+    empty.style.display = '';
+    updateSummary();
+    updateCompatBar();
+    return;
+  }
+
+  empty.style.display = 'none';
+
+  // Group by category
+  const groups = {};
+  CAT_ORDER.forEach(c => { groups[c] = []; });
+  parts.forEach(p => { const c = p.cat || 'engine'; if (!groups[c]) groups[c] = []; groups[c].push(p); });
+
+  let html = '';
+  CAT_ORDER.forEach(cat => {
+    const catParts = groups[cat];
+    if (!catParts.length) return;
+    html += `<div class="cat-group">
+      <div class="cat-label">
+        <span class="cat-label-icon">${CAT_LABELS[cat]?.split(' ')[0]||'🔧'}</span>
+        ${CAT_LABELS[cat]?.split(' ').slice(1).join(' ')||cat}
+        <button class="cat-add-btn" onclick="openAddModal('${cat}')">+ Add ${cat}</button>
+      </div>`;
+    catParts.forEach(p => {
+      const prices = getCachedPrices(p);
+      const bestPrice = Math.min(prices.amazon, prices.ebay, prices.rockauto);
+      const bestStore = prices.amazon === bestPrice ? 'Amazon' : prices.ebay === bestPrice ? 'eBay' : 'RockAuto';
+      const compatClass = p.compat === 'ok' ? 'ok' : p.compat === 'warn' ? 'warn' : 'req';
+      const compatTxt   = p.compat === 'ok' ? '✓ Compatible' : p.compat === 'warn' ? '⚠ Check Notes' : '⚠ Req. Mods';
+      // RockAuto search URL
+      const makeModel = `${BUILD.make || ''} ${BUILD.model || ''}`.trim().toLowerCase().replace(/\s+/g,'+');
+      const raSearch  = `https://www.rockauto.com/en/partsearch/?query=${encodeURIComponent(p.name.toLowerCase())}+${encodeURIComponent((BUILD.make||'')+'+'+(BUILD.model||''))}`;
+      html += `
+      <div class="part-row" id="prow_${p.id}">
+        <div class="pr-cell"><span class="pr-cat">${CAT_LABELS[p.cat]||p.cat}</span></div>
+        <div class="pr-cell" style="padding-left:8px">
+          <div class="pr-part">
+            <div class="pr-name">${p.icon||'🔧'} ${p.name}</div>
+            <div class="pr-brand">${p.brand}</div>
+            <span class="pr-warn ${compatClass}">${compatTxt}</span>
+          </div>
+        </div>
+        <div class="pr-cell right">
+          <div class="pr-retailer">
+            <span class="pr-retailer-logo">Amazon</span>
+            <span class="pr-price${prices.amazon === bestPrice ? ' best' : ''}" >$${prices.amazon.toLocaleString()}</span>
+            <a class="pr-buy" href="${p.amazon}" target="_blank" rel="noopener">Buy ↗</a>
+          </div>
+        </div>
+        <div class="pr-cell right">
+          <div class="pr-retailer">
+            <span class="pr-retailer-logo">eBay</span>
+            <span class="pr-price${prices.ebay === bestPrice ? ' best' : ''}">$${prices.ebay.toLocaleString()}</span>
+            <a class="pr-buy" href="${p.ebay}" target="_blank" rel="noopener">Buy ↗</a>
+          </div>
+        </div>
+        <div class="pr-cell right">
+          <div class="pr-retailer">
+            <span class="pr-retailer-logo">RockAuto</span>
+            <span class="pr-price${prices.rockauto === bestPrice ? ' best' : ''}">$${prices.rockauto.toLocaleString()}</span>
+            <a class="pr-buy" href="${raSearch}" target="_blank" rel="noopener">Buy ↗</a>
+          </div>
+        </div>
+        <div class="pr-cell right">
+          <div class="pr-best">
+            <div class="pr-best-price">$${bestPrice.toLocaleString()}</div>
+            <div class="pr-best-store">${bestStore}</div>
+          </div>
+        </div>
+        <div class="pr-cell pr-spark center">
+          <div class="spark-wrap" id="spark_${p.id}">
+            <canvas id="sc_${p.id}" width="72" height="32"></canvas>
+            <div class="spark-tooltip" id="stt_${p.id}">
+              <div class="st-title">30-Day Price</div>
+              <div class="st-row"><span class="st-k">Current</span><span class="st-v st-now" id="stt_now_${p.id}">$${p.price}</span></div>
+              <div class="st-row"><span class="st-k">30d Low</span><span class="st-v st-low" id="stt_low_${p.id}">—</span></div>
+              <div class="st-row"><span class="st-k">30d High</span><span class="st-v st-high" id="stt_high_${p.id}">—</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="pr-cell center" style="padding:0">
+          <button class="pr-remove" title="Remove" onclick="removePart(${p.id})">✕</button>
+        </div>
+      </div>`;
+    });
+    // Add-part row per category
+    html += `<div class="add-row" onclick="openAddModal('${cat}')">
+      <div class="add-row-icon">+</div>
+      <span class="add-row-text">Add ${CAT_LABELS[cat]?.split(' ').slice(1).join(' ')||cat} part</span>
+    </div>`;
+    html += '</div>';
+  });
+
+  body.innerHTML = html;
+
+  // Draw sparklines after render
+  parts.forEach(p => {
+    const c = document.getElementById('sc_' + p.id);
+    if (!c) return;
+    const stats = drawSparkline(c, p, 30);
+    if (stats) {
+      const low  = document.getElementById('stt_low_' + p.id);
+      const high = document.getElementById('stt_high_' + p.id);
+      if (low)  low.textContent  = '$' + stats.min.toLocaleString();
+      if (high) high.textContent = '$' + stats.max.toLocaleString();
+    }
+  });
+
+  updateSummary();
+  updateCompatBar();
+  drawPriceChart(30);
+}
+
+// ═══════════════════════════════════════════════
+// SUMMARY + STATS
+// ═══════════════════════════════════════════════
+function updateSummary() {
+  const parts = BUILD.parts || [];
+  const total = parts.reduce((s, p) => {
+    const prices = getCachedPrices(p);
+    return s + Math.min(prices.amazon, prices.ebay, prices.rockauto);
+  }, 0);
+  const fullTotal = parts.reduce((s, p) => s + p.price, 0);
+  const hp     = parts.filter(p => p.hpNum > 0).reduce((s, p) => s + p.hpNum, 0);
+  const needsTune = parts.some(p => p.tune && !p.tune.toLowerCase().includes('not') && !p.tune.toLowerCase().includes('is the'));
+  const warns  = parts.filter(p => p.compat !== 'ok').length;
+  const stage  = hp < 30 ? '1' : hp < 80 ? '2' : '3+';
+
+  document.getElementById('totalPrice').textContent = '$' + fullTotal.toLocaleString();
+  document.getElementById('totalSub').textContent   = `${parts.length} parts · ${BUILD.year||''} ${BUILD.make||''} ${BUILD.model||''}`.trim();
+  document.getElementById('tcParts').textContent    = parts.length;
+  document.getElementById('tcHp').textContent       = `+${hp} whp est.`;
+  document.getElementById('tcTune').textContent     = needsTune ? 'Yes ⚠' : 'No';
+  document.getElementById('tcTune').style.color     = needsTune ? 'var(--amber)' : 'var(--green)';
+  document.getElementById('tcCompat').textContent   = warns > 0 ? `${warns} warning${warns>1?'s':''}` : 'All good ✓';
+  document.getElementById('tcCompat').style.color   = warns > 0 ? 'var(--amber)' : 'var(--green)';
+  document.getElementById('tcCheapest').textContent = '$' + total.toLocaleString();
+
+  document.getElementById('st-hp').textContent    = hp > 0 ? '+' + hp : '—';
+  document.getElementById('st-parts').textContent = parts.length;
+  document.getElementById('st-stage').textContent = parts.length > 0 ? stage : '—';
+  const diffs = parts.map(p => p.diffC === 'green' ? 1 : p.diffC === 'amber' ? 2 : 3);
+  const avgD  = diffs.length ? diffs.reduce((a,b) => a+b,0) / diffs.length : 0;
+  document.getElementById('st-diff').textContent  = avgD < 1.5 ? 'Easy' : avgD < 2.5 ? 'Moderate' : 'Hard';
+  document.getElementById('st-diff').style.color  = avgD < 1.5 ? 'var(--green)' : avgD < 2.5 ? 'var(--amber)' : 'var(--red)';
+
+  // HP bar
+  const trimInfo  = getTrimInfo(BUILD.make, BUILD.model, BUILD.trim);
+  const stockHp   = trimInfo ? trimInfo.hp : 300;
+  const estHp     = stockHp + hp;
+  const pct       = Math.min(100, (hp / (stockHp * 0.6)) * 100);
+  document.getElementById('hpFill').style.width    = pct + '%';
+  document.getElementById('hpStockLabel').textContent = `Stock: ${stockHp} hp`;
+  document.getElementById('hpModLabel').textContent   = `Est: ${estHp} whp`;
+
+  const stagesEl = document.getElementById('hpStages');
+  stagesEl.innerHTML = [
+    { label:'Stage 1 (bolt-ons)', val: Math.round(stockHp * 1.15) },
+    { label:'Stage 2 (tune+exhaust)', val: Math.round(stockHp * 1.28) },
+    { label:'Stage 3 (full build)', val: Math.round(stockHp * 1.55) },
+  ].map(s => `<div class="hp-stage-row"><span class="hs-label">${s.label}</span><span class="hs-val">${s.val} whp</span></div>`).join('');
+
+  // Build title / car label
+  if (BUILD.make && BUILD.model) {
+    document.getElementById('buildTitle').textContent = `${BUILD.year||''} ${BUILD.model} BUILD`.trim();
+    document.getElementById('buildCarLabel').textContent = `${BUILD.year||''} ${BUILD.make} ${BUILD.model}${BUILD.trim ? ' · ' + BUILD.trim : ''}`.trim();
+  }
+}
+
+// ═══════════════════════════════════════════════
+// COMPAT BAR
+// ═══════════════════════════════════════════════
+function updateCompatBar() {
+  const warnings = runCompatChecks(BUILD.parts || []);
+  const bar = document.getElementById('compatBar');
+  if (warnings.length === 0) {
+    bar.className = 'compat-bar all-good';
+    bar.innerHTML = `<div class="cb-icon">✅</div><div class="cb-text"><strong>No compatibility issues.</strong> Your build looks good.</div>`;
+    return;
+  }
+  bar.className = 'compat-bar has-warn';
+  bar.innerHTML = `
+    <div class="cb-icon">⚠️</div>
+    <div class="cb-text"><strong>${warnings.length} compatibility notice${warnings.length>1?'s':''}</strong> — review before purchasing</div>
+    <div class="cb-warnings">
+      ${warnings.map(w => `
+        <div class="cw-item ${w.type}">
+          <span>${w.msg}</span>
+          ${w.fix ? `<span class="cw-fix" onclick="openAddModal('engine')">+ ${w.fix}</span>` : ''}
+        </div>`).join('')}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// PRICE CHART (total build cost over time)
+// ═══════════════════════════════════════════════
+let chartDays = 30;
+const chartHistoryCache = {};
+
+function drawPriceChart(days) {
+  const canvas = document.getElementById('priceChart');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || 284, H = 100;
+  canvas.width = W;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, W, H);
+
+  const parts = BUILD.parts || [];
+  if (parts.length === 0) {
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#7e7d8e';
+    ctx.font = '12px DM Sans,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Add parts to see price history', W/2, H/2+4);
+    return;
+  }
+
+  // Sum up daily totals across all parts
+  const key = parts.map(p=>p.id).join(',') + '_' + days;
+  if (!chartHistoryCache[key]) {
+    const histories = parts.map(p => genPriceHistory(p.price, days));
+    chartHistoryCache[key] = Array.from({length: days}, (_, i) =>
+      histories.reduce((sum, h) => sum + h[i], 0)
+    );
+  }
+  const totals = chartHistoryCache[key];
+  const min = Math.min(...totals) * 0.97;
+  const max = Math.max(...totals) * 1.03;
+  const range = max - min || 1;
+
+  const pts = totals.map((v, i) => ({
+    x: (i / (totals.length - 1)) * W,
+    y: H - 8 - ((v - min) / range) * (H - 20)
+  }));
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75].forEach(f => {
+    ctx.beginPath(); ctx.moveTo(0, H*f); ctx.lineTo(W, H*f); ctx.stroke();
+  });
+
+  // Gradient
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, 'rgba(91,170,240,0.22)');
+  grad.addColorStop(1, 'rgba(91,170,240,0)');
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, H);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  for (let i = 1; i < pts.length; i++) {
+    const cp = { x: (pts[i-1].x + pts[i].x) / 2, y: (pts[i-1].y + pts[i].y) / 2 };
+    ctx.quadraticCurveTo(pts[i-1].x, pts[i-1].y, cp.x, cp.y);
+  }
+  ctx.lineTo(pts[pts.length-1].x, pts[pts.length-1].y);
+  ctx.strokeStyle = '#5BAAF0';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Price labels
+  ctx.fillStyle = '#7e7d8e';
+  ctx.font = '9px DM Mono,monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText('$'+Math.round(max).toLocaleString(), W-3, 12);
+  ctx.fillText('$'+Math.round(min).toLocaleString(), W-3, H-4);
+
+  // Today marker
+  const last = pts[pts.length-1];
+  ctx.beginPath();
+  ctx.arc(last.x, last.y, 3.5, 0, Math.PI*2);
+  ctx.fillStyle = '#5BAAF0';
+  ctx.fill();
+  ctx.strokeStyle = '#08090b';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+}
+
+function setChartRange(btn, days) {
+  document.querySelectorAll('.cc-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  chartDays = days;
+  drawPriceChart(days);
+}
+
+// ═══════════════════════════════════════════════
+// ADD / REMOVE PARTS
+// ═══════════════════════════════════════════════
+let modalCat = 'engine';
+let allAvailableParts = [];
+
+function openAddModal(cat) {
+  modalCat = cat || 'engine';
+  allAvailableParts = getPartsForVehicle(BUILD.make || 'Toyota', BUILD.model || 'GR Supra');
+  document.getElementById('modalTitle').textContent = 'Add ' + (CAT_LABELS[cat]?.split(' ').slice(1).join(' ') || 'Part');
+  document.getElementById('modalSub').textContent = `${BUILD.year||''} ${BUILD.make||''} ${BUILD.model||''}`.trim() || 'Select a vehicle first';
+  document.getElementById('modalSearch').value = '';
+  filterModalParts();
+  document.getElementById('addModal').classList.add('show');
+}
+
+function filterModalParts() {
+  const q = document.getElementById('modalSearch').value.toLowerCase();
+  let parts = allAvailableParts;
+  if (modalCat) parts = parts.filter(p => p.cat === modalCat || !modalCat);
+  if (q) parts = parts.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
+  const addedIds = (BUILD.parts||[]).map(p => p.id);
+  document.getElementById('modalParts').innerHTML = parts.length === 0
+    ? '<div style="text-align:center;padding:24px;color:var(--muted)">No parts found</div>'
+    : parts.map(p => `
+      <div class="mp">
+        <span class="mp-icon">${p.icon||'🔧'}</span>
+        <div class="mp-info">
+          <div class="mp-name">${p.name}</div>
+          <div class="mp-brand">${p.brand} · ${p.hp}</div>
+        </div>
+        <span class="mp-price">$${p.price.toLocaleString()}</span>
+        <button class="mp-add${addedIds.includes(p.id)?' done':''}" onclick="addPartFromModal(${p.id})">${addedIds.includes(p.id)?'✓ Added':'+Add'}</button>
+      </div>`).join('');
+}
+
+function addPartFromModal(id) {
+  const allParts = getPartsForVehicle(BUILD.make || 'Toyota', BUILD.model || 'GR Supra');
+  const part = allParts.find(p => p.id === id);
+  if (!part) return;
+  if (!(BUILD.parts||[]).find(p => p.id === id)) {
+    BUILD.parts = [...(BUILD.parts||[]), part];
+    saveBuild(BUILD);
+    renderTable();
+    filterModalParts();
+    showToast(`✓ ${part.name} added to build`);
+  }
+}
+
+function removePart(id) {
+  BUILD.parts = (BUILD.parts||[]).filter(p => p.id !== id);
+  saveBuild(BUILD);
+  renderTable();
+  showToast('Part removed');
+}
+
+function closeModal(e) {
+  if (e.target.id === 'addModal') document.getElementById('addModal').classList.remove('show');
+}
+
+// ═══════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════
+function clearBuild() {
+  if (!confirm('Clear all parts from your build?')) return;
+  BUILD.parts = [];
+  saveBuild(BUILD);
+  renderTable();
+  showToast('Build cleared');
+}
+
+function exportBuild() {
+  const parts = BUILD.parts || [];
+  const lines = [
+    `CarBuilding101 — ${BUILD.year||''} ${BUILD.make||''} ${BUILD.model||''} Build`,
+    '─'.repeat(44),
+    ...parts.map((p,i) => {
+      const pr = getCachedPrices(p);
+      const best = Math.min(pr.amazon, pr.ebay, pr.rockauto);
+      return `${i+1}. ${p.name} (${p.brand}) — $${best.toLocaleString()}`;
+    }),
+    '─'.repeat(44),
+    `Total: $${parts.reduce((s,p)=>s+p.price,0).toLocaleString()}`,
+    `HP Gain: +${parts.filter(p=>p.hpNum>0).reduce((s,p)=>s+p.hpNum,0)} whp est.`,
+    '',
+    'Built at carbuilding101.github.io'
+  ];
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(() => showToast('📋 Build list copied to clipboard'))
+    .catch(() => showToast('Copy not supported — try right-click'));
+}
+
+function shareBuild() {
+  const url = window.location.href;
+  navigator.clipboard.writeText(url)
+    .then(() => showToast('🔗 Build URL copied!'))
+    .catch(() => showToast('Share not supported'));
+}
+
+// ═══════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════
+renderTable();
+window.addEventListener('resize', () => drawPriceChart(chartDays));
+</script>
+</body>
+</html>
